@@ -9,7 +9,60 @@
   <link rel="icon" sizes="192x192" href="icone.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <style>
+  <meta name="theme-color" content="#000000">
+
+<script>
+const iconSVG = `
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 16 16" shape-rendering="crispEdges">
+
+<!-- GRAMA -->
+<rect x="0" y="0" width="16" height="4" fill="#4CAF50"/>
+<rect x="2" y="0" width="2" height="1" fill="#66bb6a"/>
+<rect x="6" y="1" width="2" height="1" fill="#66bb6a"/>
+<rect x="10" y="0" width="2" height="1" fill="#66bb6a"/>
+
+<!-- TERRA -->
+<rect x="0" y="4" width="16" height="12" fill="#8B5A2B"/>
+<rect x="3" y="6" width="2" height="2" fill="#A0522D"/>
+<rect x="7" y="8" width="2" height="2" fill="#A0522D"/>
+<rect x="11" y="10" width="2" height="2" fill="#A0522D"/>
+
+</svg>
+`;
+
+const iconBlob = new Blob([iconSVG], {type: "image/svg+xml"});
+const iconURL = URL.createObjectURL(iconBlob);
+
+const manifest = {
+  name: "Minecraft",
+  short_name: "Minecraft",
+  start_url: ".",
+  display: "standalone",
+  background_color: "#000000",
+  theme_color: "#000000",
+  icons: [
+    {
+      src: iconURL,
+      sizes: "192x192",
+      type: "image/svg+xml"
+    },
+    {
+      src: iconURL,
+      sizes: "512x512",
+      type: "image/svg+xml"
+    }
+  ]
+};
+
+const blob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
+const url = URL.createObjectURL(blob);
+
+const link = document.createElement("link");
+link.rel = "manifest";
+link.href = url;
+
+document.head.appendChild(link);
+</script><style>
     body {
         margin: 0;
         padding: 0;
@@ -291,4 +344,4 @@
     window.onresize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; init(); }
 </script>
 </body>
-     </html>
+       </html>
