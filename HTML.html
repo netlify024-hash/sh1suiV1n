@@ -1,0 +1,347 @@
+<html lang="pt-br">
+ <head>
+  <meta name="viewport" content="width=device-width, initial-scale=1"> 
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minecraft</title>
+  <link rel="icon" href="icone.png">
+  <link rel="apple-touch-icon" href="icone.png">
+  <link rel="icon" sizes="192x192" href="icone.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#000000">
+
+<script>
+const iconSVG = `
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 16 16" shape-rendering="crispEdges">
+
+<!-- GRAMA -->
+<rect x="0" y="0" width="16" height="4" fill="#4CAF50"/>
+<rect x="2" y="0" width="2" height="1" fill="#66bb6a"/>
+<rect x="6" y="1" width="2" height="1" fill="#66bb6a"/>
+<rect x="10" y="0" width="2" height="1" fill="#66bb6a"/>
+
+<!-- TERRA -->
+<rect x="0" y="4" width="16" height="12" fill="#8B5A2B"/>
+<rect x="3" y="6" width="2" height="2" fill="#A0522D"/>
+<rect x="7" y="8" width="2" height="2" fill="#A0522D"/>
+<rect x="11" y="10" width="2" height="2" fill="#A0522D"/>
+
+</svg>
+`;
+
+const iconBlob = new Blob([iconSVG], {type: "image/svg+xml"});
+const iconURL = URL.createObjectURL(iconBlob);
+
+const manifest = {
+  name: "Minecraft",
+  short_name: "Minecraft",
+  start_url: ".",
+  display: "standalone",
+  background_color: "#000000",
+  theme_color: "#000000",
+  icons: [
+    {
+      src: iconURL,
+      sizes: "192x192",
+      type: "image/svg+xml"
+    },
+    {
+      src: iconURL,
+      sizes: "512x512",
+      type: "image/svg+xml"
+    }
+  ]
+};
+
+const blob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
+const url = URL.createObjectURL(blob);
+
+const link = document.createElement("link");
+link.rel = "manifest";
+link.href = url;
+
+document.head.appendChild(link);
+</script><style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+        background-color: #000;
+        color: #fff;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+    }
+
+    #holograma {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+    }
+
+    .glass-container {
+        position: relative;
+        z-index: 1;
+        width: 85%;
+        max-width: 380px;
+        background: rgba(20, 20, 20, 0.4);
+        border: 1px solid rgba(255, 140, 0, 0.3);
+        border-radius: 24px;
+        padding: 25px;
+        backdrop-filter: blur(10px);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .height-painel { height: auto; max-height: 90vh; }
+    .height-login { height: auto; text-align: center; }
+
+    .title {
+        text-align: center;
+        font-size: 20px;
+        font-weight: bold;
+        margin-bottom: 25px;
+        color: #ffffff;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+
+    .img-perfil {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        margin: 0 auto 20px;
+        display: block;
+        border: 2px solid #ff8c00;
+        object-fit: cover;
+    }
+
+    .card {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #000;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 12px;
+        margin-bottom: 12px;
+    }
+
+    .card-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .card-icon {
+        width: 40px;
+        height: 40px;
+        background: #ff8c00;
+        border-radius: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+    }
+
+    .card-icon img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .card-text h3 { margin: 0; font-size: 16px; color: #fff; }
+    .card-text p { margin: 2px 0 0; font-size: 11px; color: #bbb; }
+
+    .switch { position: relative; width: 46px; height: 24px; }
+    .switch input { display: none; }
+    .slider {
+        position: absolute; cursor: pointer; background: #333;
+        border-radius: 30px; top: 0; left: 0; right: 0; bottom: 0; transition: .3s;
+    }
+    .slider:before {
+        content: ""; position: absolute; width: 18px; height: 18px;
+        background: #fff; border-radius: 50%; top: 3px; left: 4px; transition: .3s;
+    }
+    input:checked + .slider { background: #ff8c00; }
+    input:checked + .slider:before { transform: translateX(22px); }
+
+    .inject-btn {
+        width: 100%;
+        padding: 14px;
+        margin-top: 10px;
+        background: #ff8c00;
+        border: none;
+        border-radius: 16px;
+        color: #fff;
+        font-weight: bold;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        text-transform: uppercase;
+    }
+
+    .inject-bar {
+        position: absolute; left: 0; bottom: 0; height: 4px; width: 0%; background: #fff;
+    }
+</style>
+ </head>
+ <body>
+  <canvas id="holograma"></canvas>
+  
+  <div class="glass-container height-login" id="tela-login">
+   <img src="https://i.postimg.cc/9MhbhK1q/IMG-20260309-WA0472.jpg" class="img-perfil" alt="User">
+   <div style="margin-bottom: 10px; font-size: 14px; color: #bbb;">coloca a key de acesso</div>
+   <input type="text" id="key-input" style="width: 100%; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; color: #fff; margin-bottom: 20px; text-align: center;" placeholder="insira a key...">
+   <button style="width: 100%; padding: 15px; background: #ff8c00; color: #fff; border: none; border-radius: 16px; font-weight: bold; cursor: pointer;" onclick="entrar()">logar</button>
+  </div>
+
+  <div class="glass-container height-painel" id="tela-painel" style="display: none;">
+   <div class="title">PAINEL SHISUI V1</div>
+   
+   <div class="card">
+    <div class="card-info">
+     <div class="card-icon">
+      <img src="https://i.postimg.cc/CKQ8pHfZ/IMG-20260310-WA0366.jpg">
+     </div>
+     <div class="card-text">
+      <h3>aimbot legit</h3>
+      <p>Melhora a mira.</p>
+     </div>
+    </div>
+    <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+   </div>
+   
+   <div class="card">
+    <div class="card-info">
+     <div class="card-icon">
+      <img src="https://i.postimg.cc/rwh05Cg6/IMG-20260310-WA0367.jpg">
+     </div>
+     <div class="card-text">
+      <h3>reduzir lags</h3>
+      <p>Retirar os lags do jogo .</p>
+     </div>
+    </div>
+    <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+   </div>
+   
+   <div class="card">
+    <div class="card-info">
+     <div class="card-icon">
+      <img src="https://i.postimg.cc/6Qg8mWDh/IMG-20260310-WA0368.jpg">
+     </div>
+     <div class="card-text">
+      <h3>melhorar 2x</h3>
+      <p>Melhora sua mira 2x em ate 10%.</p>
+     </div>
+    </div>
+    <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+   </div>
+   
+   <div class="card">
+    <div class="card-info">
+     <div class="card-icon">
+      <img src="https://i.postimg.cc/qqXgq8gm/IMG-20260310-WA0369.jpg">
+     </div>
+     <div class="card-text">
+      <h3>Aumentar Desempenho</h3>
+      <p>Otimização Máxima de FPS.</p>
+     </div>
+    </div>
+    <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+   </div>
+   
+   <button class="inject-btn" onclick="injetarArquivos()">ABRIR FREE FIRE
+    <div class="inject-bar" id="injectBar"></div></button>
+  </div>
+
+  <script>
+    function entrar() {
+        var key = document.getElementById("key-input").value;
+        if (key === "shisuizV1") {
+            document.getElementById("tela-login").style.display = "none";
+            document.getElementById("tela-painel").style.display = "flex";
+        } else { alert("ERRO: Key incorreta!"); }
+    }
+
+    function injetarArquivos() {
+        const btn = document.querySelector('.inject-btn');
+        const bar = document.getElementById('injectBar');
+        btn.firstChild.textContent = 'INJETANDO ARQUIVOS...';
+        let progresso = 0;
+        const intervalo = setInterval(() => {
+            progresso += 3.33;
+            bar.style.width = progresso + '%';
+            if (progresso >= 100) {
+                clearInterval(intervalo);
+                window.location.href = 'freefire://';
+            }
+        }, 100);
+    }
+
+    const canvas = document.getElementById('holograma');
+    const ctx = canvas.getContext('2d');
+    let dots = [];
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    class Dot {
+        constructor() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.speedX = (Math.random() - 0.5) * 0.8;
+            this.speedY = (Math.random() - 0.5) * 0.8;
+        }
+        draw() {
+            ctx.fillStyle = 'rgba(255, 140, 0, 0.7)';
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, 2, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        update() {
+            this.x += this.speedX;
+            this.y += this.speedY;
+            if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+            if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+        }
+    }
+
+    function init() {
+        dots = [];
+        for (let i = 0; i < 60; i++) dots.push(new Dot());
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        dots.forEach((dot, index) => {
+            dot.update();
+            dot.draw();
+            for (let j = index; j < dots.length; j++) {
+                let dx = dot.x - dots[j].x;
+                let dy = dot.y - dots[j].y;
+                let dist = Math.sqrt(dx*dx + dy*dy);
+                if (dist < 120) {
+                    ctx.strokeStyle = `rgba(255, 140, 0, ${1 - dist/120})`;
+                    ctx.lineWidth = 0.6;
+                    ctx.beginPath();
+                    ctx.moveTo(dot.x, dot.y);
+                    ctx.lineTo(dots[j].x, dots[j].y);
+                    ctx.stroke();
+                }
+            }
+        });
+        requestAnimationFrame(animate);
+    }
+
+    init();
+    animate();
+    window.onresize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; init(); }
+</script>
+</body>
+</html>
