@@ -1,0 +1,2152 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <title>SHISUI EXTERNAL</title>
+  <meta name="theme-color" content="#000000">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: linear-gradient(135deg, rgb(13,5,16) 0%, rgb(26,10,26) 50%, rgb(13,5,16) 100%);
+      background-size: 200% 200%;
+      animation: gradientShift 15s ease infinite;
+      color: #fff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px; overflow-x: hidden;
+    }
+
+    .bg-glow {
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background:
+        radial-gradient(circle at 20% 50%, rgba(200,0,0,0.12) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(200,0,0,0.08) 0%, transparent 50%);
+    }
+
+    .panel {
+      position: relative; z-index: 10;
+      width: 100%; max-width: 600px;
+      display: flex; flex-direction: row;
+      border-radius: 1rem; overflow: hidden;
+      background: linear-gradient(135deg, rgba(15,8,20,0.98) 0%, rgba(25,12,30,0.98) 100%);
+      border: 2px solid rgba(200,0,0,0.4);
+      box-shadow: rgba(0,0,0,0.5) 0px 20px 60px, rgba(200,0,0,0.3) 0px 0px 40px;
+      backdrop-filter: blur(10px);
+      animation: panelFadeIn 0.6s ease-out;
+    }
+
+    nav {
+      display: flex; flex-direction: column; gap: 10px;
+      padding: 20px 10px;
+      background: linear-gradient(rgba(10,5,15,0.95) 0%, rgba(15,8,20,0.95) 100%);
+      border-right: 2px solid rgba(200,0,0,0.3);
+      width: 70px; min-width: 70px;
+    }
+
+    .tab-btn {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 14px 8px; border-radius: 0.75rem;
+      border: 1px solid rgba(200,0,0,0.15);
+      cursor: pointer; background: transparent; color: rgb(181,163,200);
+      transition: all 0.3s; position: relative; overflow: hidden;
+    }
+    .tab-btn:hover { border-color: rgba(200,0,0,0.4); color: rgb(220,50,50); }
+    .tab-btn.active {
+      background: rgba(200,0,0,0.15); border-color: rgb(220,0,0);
+      color: rgb(220,50,50); box-shadow: rgba(200,0,0,0.4) 0px 0px 20px;
+    }
+    .tab-btn .bar {
+      position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+      border-radius: 0 2px 2px 0;
+      background: linear-gradient(135deg, rgb(220,0,0), rgb(160,0,0));
+      transform: scaleY(0); transition: transform 0.3s;
+    }
+    .tab-btn.active .bar { transform: scaleY(1); }
+    .tab-btn svg { display: block; }
+
+    .content-wrap { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+
+    header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 20px;
+      background: linear-gradient(135deg, rgba(10,5,15,0.95), rgba(15,8,20,0.95));
+      border-bottom: 2px solid rgba(200,0,0,0.3);
+    }
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .header-logo { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; color: rgb(220,50,50); filter: drop-shadow(rgb(220,0,0) 0px 0px 12px); }
+    h1 { font-size: 1.1rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: rgb(220,50,50); }
+    .header-actions { display: flex; align-items: center; gap: 8px; }
+    .hbtn { width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 0.5rem; cursor: pointer; transition: all 0.3s; text-decoration: none; border: none; }
+    .hbtn-close { background: rgba(255,68,68,0.15); border: 1px solid rgba(255,68,68,0.4) !important; color: rgb(236,85,85); }
+
+    main { padding: 24px; flex: 1; overflow-y: auto; max-height: 500px; min-height: 400px; }
+    .section { display: none; animation: sectionFadeIn 0.4s ease-out; }
+    .section.active { display: block; }
+
+    .sec-head {
+      display: flex; align-items: center; gap: 16px;
+      margin-bottom: 20px; padding: 16px; border-radius: 0.75rem;
+      background: rgba(200,0,0,0.08); border: 1px solid rgba(200,0,0,0.25);
+    }
+    .sec-icon { width: 40px; height: 40px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: rgb(220,50,50); filter: drop-shadow(rgb(220,0,0) 0px 0px 12px); }
+    .sec-title { font-size: 1.2rem; font-weight: 700; color: rgb(220,50,50); letter-spacing: 0.5px; margin-bottom: 2px; }
+    .sec-desc { font-size: 0.8rem; color: rgb(181,163,200); }
+
+    .cards { display: flex; flex-direction: column; gap: 12px; }
+    .card {
+      border-radius: 0.75rem; padding: 16px;
+      border: 1px solid rgba(200,0,0,0.2);
+      background: linear-gradient(135deg, rgba(15,8,20,0.95), rgba(25,12,30,0.95));
+      box-shadow: rgba(0,0,0,0.3) 0px 4px 20px;
+      transition: transform 0.3s; animation: cardSlideIn 0.4s ease-out both;
+    }
+    .card:hover { transform: translateX(3px); }
+    .card-row { display: flex; align-items: center; gap: 12px; }
+    .card-icon { width: 32px; height: 32px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: rgb(220,50,50); filter: drop-shadow(rgb(220,0,0) 0px 0px 8px); }
+    .card-info { flex: 1; }
+    .card-title { font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 2px; }
+    .card-desc { font-size: 0.75rem; color: rgb(181,163,200); }
+
+    /* toggle */
+    .toggle { position: relative; display: inline-block; flex-shrink: 0; width: 45px; height: 24px; cursor: pointer; }
+    .toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .track { position: absolute; inset: 0; border-radius: 9999px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); transition: all 0.3s; }
+    .thumb { position: absolute; width: 16px; height: 16px; left: 3px; bottom: 3px; background: white; border-radius: 9999px; box-shadow: rgba(0,0,0,0.3) 0px 2px 5px; transition: all 0.3s; transform: translateX(0); }
+    .toggle input:checked + .track { background: linear-gradient(135deg, rgb(220,0,0), rgb(160,0,0)); border-color: rgb(220,0,0); box-shadow: rgba(220,0,0,0.5) 0px 0px 15px; animation: toggleGlow 2s ease-in-out infinite; }
+    .toggle input:checked + .track .thumb { transform: translateX(21px); }
+
+    /* radio option */
+    .radio-card {
+      border-radius: 0.75rem; padding: 14px 16px;
+      border: 1px solid rgba(200,0,0,0.2);
+      background: linear-gradient(135deg, rgba(15,8,20,0.95), rgba(25,12,30,0.95));
+      display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.3s;
+      animation: cardSlideIn 0.4s ease-out both;
+    }
+    .radio-card:hover { transform: translateX(3px); border-color: rgba(220,0,0,0.4); }
+    .radio-card.selected { background: rgba(200,0,0,0.12); border-color: rgb(220,0,0); box-shadow: rgba(200,0,0,0.25) 0px 0px 15px; }
+    .radio-dot { width: 22px; height: 22px; border-radius: 50%; border: 2px solid rgba(200,0,0,0.4); flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.3s; }
+    .radio-card.selected .radio-dot { border-color: rgb(220,0,0); background: rgb(220,0,0); box-shadow: 0 0 10px rgba(220,0,0,0.6); }
+    .radio-dot::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: white; display: none; }
+    .radio-card.selected .radio-dot::after { display: block; }
+
+    /* hz badge */
+    .hz-badge { background: rgb(220,0,0); color: white; font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: 6px; white-space: nowrap; }
+
+    /* hz slider */
+    .hz-slider-wrap { margin-top: 10px; }
+    .hz-labels { display: flex; justify-content: space-between; font-size: 0.7rem; color: rgb(181,163,200); margin-bottom: 4px; }
+    input[type="range"] { width: 100%; height: 6px; border-radius: 3px; background: rgba(255,255,255,0.1); outline: none; cursor: pointer; -webkit-appearance: none; }
+    input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: linear-gradient(135deg, rgb(220,0,0), rgb(160,0,0)); cursor: pointer; box-shadow: 0 0 12px rgba(220,0,0,0.6); transition: all 0.3s; }
+
+    /* pro player feature item */
+    .feat-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 16px; border-radius: 0.75rem;
+      background: rgba(200,0,0,0.1); border: 1px solid rgba(200,0,0,0.25);
+      animation: cardSlideIn 0.4s ease-out both;
+    }
+    .feat-icon { width: 36px; height: 36px; border-radius: 8px; background: rgb(200,0,0); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .feat-title { font-size: 0.95rem; font-weight: 700; color: #fff; }
+    .feat-desc { font-size: 0.75rem; color: rgb(181,163,200); }
+
+    /* status dot */
+    .status-row { display: flex; align-items: center; gap: 8px; margin-top: 16px; }
+    .dot-green { width: 10px; height: 10px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 8px #22c55e; flex-shrink: 0; }
+    .dot-gray { width: 10px; height: 10px; border-radius: 50%; background: rgb(100,100,120); flex-shrink: 0; }
+    .status-text { font-size: 0.9rem; font-weight: 600; }
+
+    /* inject buttons */
+    .inject-btn {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      width: 100%; padding: 14px; border-radius: 0.75rem;
+      border: none; cursor: pointer; font-size: 1rem; font-weight: 700;
+      letter-spacing: 1px; text-transform: uppercase; color: white;
+      background: linear-gradient(135deg, rgb(220,0,60), rgb(180,0,40));
+      box-shadow: 0 0 20px rgba(220,0,60,0.4);
+      transition: all 0.3s; margin-bottom: 10px;
+    }
+    .inject-btn:hover { transform: translateY(-2px); box-shadow: 0 0 30px rgba(220,0,60,0.6); }
+
+    /* log box */
+    .log-box {
+      width: 100%; min-height: 90px; padding: 10px 12px;
+      background: rgba(0,0,0,0.5); border: 1px solid rgba(200,0,0,0.2);
+      border-radius: 0.5rem; font-family: monospace; font-size: 0.75rem;
+      color: rgb(220,50,50); overflow-y: auto; white-space: pre-wrap;
+      resize: none; outline: none;
+    }
+    .log-label { font-size: 0.75rem; color: rgb(181,163,200); margin-bottom: 6px; }
+
+    /* awaiting */
+    .await-row {
+      display: flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 0.5rem; padding: 10px 14px; margin-bottom: 10px;
+    }
+
+    /* inject big icon */
+    .inject-icon-wrap {
+      width: 100px; height: 100px; border-radius: 50%;
+      border: 2px solid rgba(200,0,0,0.4);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 20px; color: rgb(220,50,50);
+      filter: drop-shadow(0 0 20px rgba(220,0,0,0.5));
+    }
+
+    /* toast */
+    #toast {
+      position: fixed; bottom: 32px; left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: rgba(255,255,255,0.9); color: #000;
+      padding: 12px 24px; border-radius: 1rem; font-weight: 600; font-size: 0.875rem;
+      box-shadow: rgba(0,0,0,0.3) 0px 10px 30px;
+      display: flex; align-items: center; gap: 10px;
+      z-index: 999999;
+      transition: transform 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
+      pointer-events: none;
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(135deg, rgb(220,0,0), rgb(160,0,0)); border-radius: 10px; }
+
+    @keyframes gradientShift { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+    @keyframes panelFadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+    @keyframes sectionFadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes cardSlideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes toggleGlow { 0%,100% { box-shadow: rgba(220,0,0,0.5) 0px 0px 15px; } 50% { box-shadow: rgba(220,0,0,0.7) 0px 0px 25px; } }
+
+    @media (max-width: 480px) {
+      .panel { border-radius: 0.75rem; margin: 4px; }
+      nav { width: 56px; min-width: 56px; padding: 12px 6px; }
+      .tab-btn { padding: 10px 4px; }
+      .tab-btn svg { width: 22px !important; height: 22px !important; }
+      header { padding: 10px 12px; }
+      main { padding: 12px; }
+      h1 { font-size: 0.9rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="bg-glow"></div>
+
+<div class="panel">
+  <!-- SIDEBAR -->
+  <nav>
+    <button class="tab-btn active" onclick="switchTab(0)">
+      <div class="bar"></div>
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/>
+        <circle cx="12" cy="12" r="2" fill="currentColor"/>
+        <line x1="12" y1="2" x2="12" y2="6" stroke-linecap="round"/>
+        <line x1="12" y1="18" x2="12" y2="22" stroke-linecap="round"/>
+        <line x1="2" y1="12" x2="6" y2="12" stroke-linecap="round"/>
+        <line x1="18" y1="12" x2="22" y2="12" stroke-linecap="round"/>
+      </svg>
+    </button>
+    <button class="tab-btn" onclick="switchTab(1)">
+      <div class="bar"></div>
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 16V8C21 7.47 20.79 6.96 20.41 6.59C20.04 6.21 19.53 6 19 6H5C4.47 6 3.96 6.21 3.59 6.59C3.21 6.96 3 7.47 3 8V16C3 16.53 3.21 17.04 3.59 17.41C3.96 17.79 4.47 18 5 18H19C19.53 18 20.04 17.79 20.41 17.41C20.79 17.04 21 16.53 21 16Z" stroke-linejoin="round"/>
+        <path d="M3 10H21"/><path d="M12 6V18"/>
+      </svg>
+    </button>
+    <button class="tab-btn" onclick="switchTab(2)">
+      <div class="bar"></div>
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M6 2L18 2L16 8L8 8L6 2Z" stroke-linejoin="round"/>
+        <path d="M8 8L8 20L10 18L12 20L14 18L16 20L16 8" stroke-linejoin="round"/>
+        <line x1="12" y1="8" x2="12" y2="20"/>
+      </svg>
+    </button>
+    <button class="tab-btn" onclick="switchTab(3)">
+      <div class="bar"></div>
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 2L3 6V11C3 16.55 6.84 21.74 12 23C17.16 21.74 21 16.55 21 11V6L12 2Z" stroke-linejoin="round"/>
+        <path d="M9 12L11 14L15 10" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <button class="tab-btn" onclick="switchTab(4)">
+      <div class="bar"></div>
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M5 12H19" stroke-linecap="round"/>
+        <path d="M12 5V19" stroke-linecap="round"/>
+        <path d="M3 3L21 21" stroke-linecap="round"/>
+        <path d="M18 6L6 18" stroke-linecap="round"/>
+        <circle cx="12" cy="12" r="3"/>
+      </svg>
+    </button>
+  </nav>
+
+  <div class="content-wrap">
+    <header>
+      <div class="header-left">
+        <div class="header-logo">
+          <svg width="35" height="35" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/>
+            <circle cx="12" cy="12" r="2" fill="currentColor"/>
+            <line x1="12" y1="2" x2="12" y2="6" stroke-linecap="round"/>
+            <line x1="12" y1="18" x2="12" y2="22" stroke-linecap="round"/>
+            <line x1="2" y1="12" x2="6" y2="12" stroke-linecap="round"/>
+            <line x1="18" y1="12" x2="22" y2="12" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h1>SHISUI EXTERNAL</h1>
+      </div>
+      <div class="header-actions">
+        <button class="hbtn hbtn-close" onclick="showToast('Interface fechada!')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18" stroke-linecap="round"/>
+            <line x1="6" y1="6" x2="18" y2="18" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <main>
+
+      <!-- TAB 0: Controle de Mira -->
+      <div class="section active" id="sec-0">
+        <div class="sec-head">
+          <div class="sec-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/>
+              <circle cx="12" cy="12" r="2" fill="currentColor"/>
+              <line x1="12" y1="2" x2="12" y2="6" stroke-linecap="round"/>
+              <line x1="12" y1="18" x2="12" y2="22" stroke-linecap="round"/>
+              <line x1="2" y1="12" x2="6" y2="12" stroke-linecap="round"/>
+              <line x1="18" y1="12" x2="22" y2="12" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div>
+            <div class="sec-title">Controle de Mira</div>
+            <div class="sec-desc">Configure os recursos de precisão e estabilidade</div>
+          </div>
+        </div>
+        <div class="cards">
+          <div class="card" style="animation-delay:0.1s">
+            <div class="card-row">
+              <div class="card-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2" fill="currentColor"/><line x1="12" y1="2" x2="12" y2="6" stroke-linecap="round"/><line x1="12" y1="18" x2="12" y2="22" stroke-linecap="round"/><line x1="2" y1="12" x2="6" y2="12" stroke-linecap="round"/><line x1="18" y1="12" x2="22" y2="12" stroke-linecap="round"/></svg></div>
+              <div class="card-info"><div class="card-title">Controle de Recoil</div><div class="card-desc">Reduz o recuo da arma</div></div>
+              <label class="toggle"><input type="checkbox" onchange="handleToggle(this,'Controle de Recoil')"><div class="track"><div class="thumb"></div></div></label>
+            </div>
+          </div>
+          <div class="card" style="animation-delay:0.2s">
+            <div class="card-row">
+              <div class="card-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L3 6V11C3 16.55 6.84 21.74 12 23C17.16 21.74 21 16.55 21 11V6L12 2Z" stroke-linejoin="round"/><path d="M9 12L11 14L15 10" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <div class="card-info"><div class="card-title">Aimbot Legit</div><div class="card-desc">Melhora o rastreamento</div></div>
+              <label class="toggle"><input type="checkbox" onchange="handleToggle(this,'Aimbot Legit')"><div class="track"><div class="thumb"></div></div></label>
+            </div>
+          </div>
+          <div class="card" style="animation-delay:0.3s">
+            <div class="card-row">
+              <div class="card-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L18 2L16 8L8 8L6 2Z" stroke-linejoin="round"/><path d="M8 8L8 20L10 18L12 20L14 18L16 20L16 8" stroke-linejoin="round"/><line x1="12" y1="8" x2="12" y2="20"/></svg></div>
+              <div class="card-info"><div class="card-title">Precisão Absoluta</div><div class="card-desc">Máxima exatidão</div></div>
+              <label class="toggle"><input type="checkbox" onchange="handleToggle(this,'Precisão Absoluta')"><div class="track"><div class="thumb"></div></div></label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 1: Otimização de Performance -->
+      <div class="section" id="sec-1">
+        <div class="sec-head">
+          <div class="sec-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 16V8C21 7.47 20.79 6.96 20.41 6.59C20.04 6.21 19.53 6 19 6H5C4.47 6 3.96 6.21 3.59 6.59C3.21 6.96 3 7.47 3 8V16C3 16.53 3.21 17.04 3.59 17.41C3.96 17.79 4.47 18 5 18H19C19.53 18 20.04 17.79 20.41 17.41C20.79 17.04 21 16.53 21 16Z" stroke-linejoin="round"/>
+              <path d="M3 10H21"/><path d="M12 6V18"/>
+            </svg>
+          </div>
+          <div>
+            <div class="sec-title">Otimização de Performance</div>
+            <div class="sec-desc">Maximize o desempenho do sistema</div>
+          </div>
+        </div>
+        <div class="cards">
+          <div class="card" style="animation-delay:0.1s">
+            <div class="card-row">
+              <div class="card-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8C21 7.47 20.79 6.96 20.41 6.59C20.04 6.21 19.53 6 19 6H5C4.47 6 3.96 6.21 3.59 6.59C3.21 6.96 3 7.47 3 8V16C3 16.53 3.21 17.04 3.59 17.41C3.96 17.79 4.47 18 5 18H19C19.53 18 20.04 17.79 20.41 17.41C20.79 17.04 21 16.53 21 16Z" stroke-linejoin="round"/><path d="M3 10H21"/><path d="M12 6V18"/></svg></div>
+              <div class="card-info"><div class="card-title">Estabilização de Tela</div><div class="card-desc">Reduz trepidação visual</div></div>
+              <label class="toggle"><input type="checkbox" onchange="handleToggle(this,'Estabilização de Tela')"><div class="track"><div class="thumb"></div></div></label>
+            </div>
+          </div>
+          <div class="card" style="animation-delay:0.2s">
+            <div class="card-row">
+              <div class="card-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L18 2L16 8L8 8L6 2Z" stroke-linejoin="round"/><path d="M8 8L8 20L10 18L12 20L14 18L16 20L16 8" stroke-linejoin="round"/><line x1="12" y1="8" x2="12" y2="20"/></svg></div>
+              <div class="card-info"><div class="card-title">Diminuir Input Lag</div><div class="card-desc">Resposta instantânea</div></div>
+              <label class="toggle"><input type="checkbox" onchange="handleToggle(this,'Diminuir Input Lag')"><div class="track"><div class="thumb"></div></div></label>
+            </div>
+          </div>
+          <div class="card" style="animation-delay:0.3s">
+            <div class="card-row">
+              <div class="card-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L3 6V11C3 16.55 6.84 21.74 12 23C17.16 21.74 21 16.55 21 11V6L12 2Z" stroke-linejoin="round"/><path d="M9 12L11 14L15 10" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <div class="card-info">
+                <div class="card-row" style="margin-bottom:10px;">
+                  <div class="card-info"><div class="card-title">Taxa de Hertz</div><div class="card-desc">Ajuste a taxa de atualização</div></div>
+                  <span class="hz-badge" id="hz-badge">144 Hz</span>
+                </div>
+                <div class="hz-slider-wrap">
+                  <div class="hz-labels"><span>60 Hz</span><span>90 Hz</span><span>120 Hz</span><span>144 Hz</span></div>
+                  <input type="range" min="0" max="3" value="3" step="1" oninput="updateHz(this.value)">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card" style="animation-delay:0.4s">
+            <div class="card-row">
+              <div class="card-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2" fill="currentColor"/><line x1="12" y1="2" x2="12" y2="6" stroke-linecap="round"/><line x1="12" y1="18" x2="12" y2="22" stroke-linecap="round"/><line x1="2" y1="12" x2="6" y2="12" stroke-linecap="round"/><line x1="18" y1="12" x2="22" y2="12" stroke-linecap="round"/></svg></div>
+              <div class="card-info"><div class="card-title">Tirar Delay</div><div class="card-desc">Elimina atrasos</div></div>
+              <label class="toggle"><input type="checkbox" onchange="handleToggle(this,'Tirar Delay')"><div class="track"><div class="thumb"></div></div></label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: Controle de Arrasto -->
+      <div class="section" id="sec-2">
+        <div class="sec-head">
+          <div class="sec-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M6 2L18 2L16 8L8 8L6 2Z" stroke-linejoin="round"/>
+              <path d="M8 8L8 20L10 18L12 20L14 18L16 20L16 8" stroke-linejoin="round"/>
+              <line x1="12" y1="8" x2="12" y2="20"/>
+            </svg>
+          </div>
+          <div>
+            <div class="sec-title">Controle de Arrasto</div>
+            <div class="sec-desc">Ajuste a sensibilidade de movimento</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div class="radio-card selected" id="rc-0" onclick="selectRadio(0)" style="animation-delay:0.1s">
+            <div class="card-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2" fill="currentColor"/><line x1="12" y1="2" x2="12" y2="6" stroke-linecap="round"/><line x1="12" y1="18" x2="12" y2="22" stroke-linecap="round"/><line x1="2" y1="12" x2="6" y2="12" stroke-linecap="round"/><line x1="18" y1="12" x2="22" y2="12" stroke-linecap="round"/></svg></div>
+            <div class="card-info"><div class="card-title">Curto</div><div class="card-desc">Movimentos rápidos e precisos</div></div>
+            <div class="radio-dot"></div>
+          </div>
+          <div class="radio-card" id="rc-1" onclick="selectRadio(1)" style="animation-delay:0.2s">
+            <div class="card-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L3 6V11C3 16.55 6.84 21.74 12 23C17.16 21.74 21 16.55 21 11V6L12 2Z" stroke-linejoin="round"/><path d="M9 12L11 14L15 10" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="card-info"><div class="card-title">Médio</div><div class="card-desc">Equilíbrio entre velocidade e controle</div></div>
+            <div class="radio-dot"></div>
+          </div>
+          <div class="radio-card" id="rc-2" onclick="selectRadio(2)" style="animation-delay:0.3s">
+            <div class="card-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8C21 7.47 20.79 6.96 20.41 6.59C20.04 6.21 19.53 6 19 6H5C4.47 6 3.96 6.21 3.59 6.59C3.21 6.96 3 7.47 3 8V16C3 16.53 3.21 17.04 3.59 17.41C3.96 17.79 4.47 18 5 18H19C19.53 18 20.04 17.79 20.41 17.41C20.79 17.04 21 16.53 21 16Z" stroke-linejoin="round"/><path d="M3 10H21"/><path d="M12 6V18"/></svg></div>
+            <div class="card-info"><div class="card-title">Longo</div><div class="card-desc">Movimentos suaves e controlados</div></div>
+            <div class="radio-dot"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: Modo Pro Player -->
+      <div class="section" id="sec-3">
+        <div class="sec-head">
+          <div class="sec-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2L3 6V11C3 16.55 6.84 21.74 12 23C17.16 21.74 21 16.55 21 11V6L12 2Z" stroke-linejoin="round"/>
+              <path d="M9 12L11 14L15 10" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div>
+            <div class="sec-title">Modo Pro Player</div>
+            <div class="sec-desc">Configuração profissional completa</div>
+          </div>
+        </div>
+        <div class="cards">
+          <div class="card" style="animation-delay:0.1s">
+            <div class="card-row">
+              <div class="card-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L3 6V11C3 16.55 6.84 21.74 12 23C17.16 21.74 21 16.55 21 11V6L12 2Z" stroke-linejoin="round"/><path d="M9 12L11 14L15 10" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <div class="card-info"><div class="card-title" style="font-size:1rem;color:rgb(220,50,50);">Pacote Profissional</div><div class="card-desc">Ativa todas as configurações pro</div></div>
+              <label class="toggle"><input type="checkbox" id="pro-toggle" onchange="togglePro(this)"><div class="track"><div class="thumb"></div></div></label>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-top:12px;" id="pro-features">
+          <div class="feat-item" style="animation-delay:0.2s">
+            <div class="feat-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2" fill="white"/><line x1="12" y1="2" x2="12" y2="6" stroke-linecap="round"/><line x1="12" y1="18" x2="12" y2="22" stroke-linecap="round"/><line x1="2" y1="12" x2="6" y2="12" stroke-linecap="round"/><line x1="18" y1="12" x2="22" y2="12" stroke-linecap="round"/></svg></div>
+            <div><div class="feat-title">Mira Estável</div><div class="feat-desc">Estabilização máxima para precisão</div></div>
+          </div>
+          <div class="feat-item" style="animation-delay:0.3s">
+            <div class="feat-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M21 16V8C21 7.47 20.79 6.96 20.41 6.59C20.04 6.21 19.53 6 19 6H5C4.47 6 3.96 6.21 3.59 6.59C3.21 6.96 3 7.47 3 8V16C3 16.53 3.21 17.04 3.59 17.41C3.96 17.79 4.47 18 5 18H19C19.53 18 20.04 17.79 20.41 17.41C20.79 17.04 21 16.53 21 16Z" stroke-linejoin="round"/><path d="M3 10H21"/><path d="M12 6V18"/></svg></div>
+            <div><div class="feat-title">Capa Leve</div><div class="feat-desc">Otimização de recursos do sistema</div></div>
+          </div>
+          <div class="feat-item" style="animation-delay:0.4s">
+            <div class="feat-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M6 2L18 2L16 8L8 8L6 2Z" stroke-linejoin="round"/><path d="M8 8L8 20L10 18L12 20L14 18L16 20L16 8" stroke-linejoin="round"/><line x1="12" y1="8" x2="12" y2="20"/></svg></div>
+            <div><div class="feat-title">Resposta Rápida</div><div class="feat-desc">Latência mínima e input instantâneo</div></div>
+          </div>
+          <div class="status-row" id="pro-status" style="display:none;">
+            <div class="dot-green"></div>
+            <span class="status-text" style="color:#22c55e;">Ativado</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4: Controle de Injeção -->
+      <div class="section" id="sec-4">
+        <div style="text-align:center;margin-bottom:20px;">
+          <div class="inject-icon-wrap">
+            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M5 12H19" stroke-linecap="round"/>
+              <path d="M12 5V19" stroke-linecap="round"/>
+              <path d="M3 3L21 21" stroke-linecap="round"/>
+              <path d="M18 6L6 18" stroke-linecap="round"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </div>
+          <div class="sec-title">Controle de Injeção</div>
+          <div class="sec-desc" style="margin-top:4px;">Selecione o jogo para injetar o sistema</div>
+        </div>
+
+        <button class="inject-btn" onclick="startInject('FF')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12H19" stroke-linecap="round"/><path d="M12 5V19" stroke-linecap="round"/><path d="M3 3L21 21" stroke-linecap="round"/><path d="M18 6L6 18" stroke-linecap="round"/><circle cx="12" cy="12" r="3"/></svg>
+          INJETAR NO FF
+        </button>
+
+        <button class="inject-btn" onclick="startInject('FF MAX')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12H19" stroke-linecap="round"/><path d="M12 5V19" stroke-linecap="round"/><path d="M3 3L21 21" stroke-linecap="round"/><path d="M18 6L6 18" stroke-linecap="round"/><circle cx="12" cy="12" r="3"/></svg>
+          INJETAR NO FF MAX
+        </button>
+
+        <div class="await-row" id="inject-status">
+          <div class="dot-gray" id="inject-dot"></div>
+          <span id="inject-status-text" style="font-size:0.85rem;color:rgb(181,163,200);">Aguardando injeção...</span>
+        </div>
+
+        <div style="margin-top:12px;">
+          <div class="log-label">Log de Injeção:</div>
+          <textarea class="log-box" id="log-box" readonly placeholder="Os logs de injeção aparecerão aqui..."></textarea>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<div id="toast">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+  <span id="toast-msg">Acesso Liberado!</span>
+</div>
+
+<script>
+  var hzValues = ['60 Hz','90 Hz','120 Hz','144 Hz'];
+
+  function updateHz(v) {
+    document.getElementById('hz-badge').textContent = hzValues[v];
+  }
+
+  function switchTab(index) {
+    document.querySelectorAll('.tab-btn').forEach(function(b,i){ b.classList.toggle('active', i===index); });
+    document.querySelectorAll('.section').forEach(function(s,i){ s.classList.toggle('active', i===index); });
+  }
+
+  function handleToggle(cb, name) {
+    showToast(name + (cb.checked ? ' ativado!' : ' desativado!'));
+  }
+
+  function selectRadio(index) {
+    ['rc-0','rc-1','rc-2'].forEach(function(id,i){
+      document.getElementById(id).classList.toggle('selected', i===index);
+    });
+    var names = ['Curto','Médio','Longo'];
+    showToast('Arrasto ' + names[index] + ' selecionado!');
+  }
+
+  function togglePro(cb) {
+    document.getElementById('pro-status').style.display = cb.checked ? 'flex' : 'none';
+    showToast('Pacote Profissional ' + (cb.checked ? 'ativado!' : 'desativado!'));
+  }
+
+  var injecting = false;
+  function startInject(game) {
+    if (injecting) return;
+    injecting = true;
+    var logBox = document.getElementById('log-box');
+    var statusText = document.getElementById('inject-status-text');
+    var dot = document.getElementById('inject-dot');
+    logBox.value = '';
+    dot.style.background = '#22c55e';
+    dot.style.boxShadow = '0 0 8px #22c55e';
+    statusText.style.color = '#22c55e';
+    statusText.textContent = 'Injeção em andamento...';
+
+    var now = new Date();
+    var ts = '[' + String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0') + ':' + String(now.getSeconds()).padStart(2,'0') + ']';
+
+    var lines = [
+      'Iniciando processo de injeção...',
+      ts + ' [INFO] Verificando integridade dos módulos...',
+      ts + ' [INFO] Carregando módulo: AimCore.dll',
+      ts + ' [INFO] Carregando módulo: RecoilFix.dll',
+      ts + ' [INFO] Carregando módulo: AntiDetect.dll',
+      ts + ' [INFO] Injetando em ' + game + '...',
+      ts + ' [INFO] Alocando memória no processo alvo...',
+      ts + ' [OK] Módulo AimCore injetado com sucesso!',
+      ts + ' [OK] Módulo RecoilFix injetado com sucesso!',
+      ts + ' [OK] Módulo AntiDetect injetado com sucesso!',
+      ts + ' [SUCCESS] Injeção concluída! Abrindo ' + game + '...',
+    ];
+
+    var i = 0;
+    function addLine() {
+      if (i < lines.length) {
+        logBox.value += lines[i] + '\n';
+        logBox.scrollTop = logBox.scrollHeight;
+        i++;
+        setTimeout(addLine, 350 + Math.random()*300);
+      } else {
+        setTimeout(function() {
+          window.location.href = 'freefire://';
+          injecting = false;
+          statusText.textContent = 'Injeção concluída!';
+        }, 400);
+      }
+    }
+    addLine();
+  }
+
+  function showToast(msg) {
+    var t = document.getElementById('toast');
+    document.getElementById('toast-msg').textContent = msg;
+    t.classList.add('show');
+    setTimeout(function(){ t.classList.remove('show'); }, 2500);
+  }
+
+  window.onload = function() { showToast('Acesso Liberado!'); };
+</script>
+<script>; ╔═══════════════════════════════════════╗
+; ║   MODULE: ZERO RECOIL v4.4          ║
+; ╚═══════════════════════════════════════╝
+; UID: 8D608F-4BF0-9F7F-4DF6C3EA | TS: 19D114670C7
+; Device: ULTRA_HIGH | Game: com.dts.freefireth
+
+[RECOIL_PATCH_CORE]
+SHAKE_VECTOR_X   = 0.00069
+SHAKE_VECTOR_Y   = 0.00011
+RECOIL_DAMP      = 0.9815
+KICKBACK_NULL    = TRUE
+BARREL_STAB      = 0.9947
+FIRE_RECOVER_MS  = 4.8ms
+BURST_RESET      = INSTANT
+
+[MEMORY_WRITE — com.dts.freefireth]
+RECOIL_BASE      = 0xF86C65DA
+RECOIL_PTR_1     = 0xA1986BFE
+RECOIL_PTR_2     = 0x52D91E70
+SHAKE_NULLIFY    = 0x4B6EBEC2
+PATTERN_SIG      = D03E64A684F624F1
+
+[REGISTRY]
+reg_add "HKLM\com.dts.freefireth\Recoil" /v "ShakeX"    /t REG_SZ    /d "0.00017"
+reg_add "HKLM\com.dts.freefireth\Recoil" /v "ShakeY"    /t REG_SZ    /d "0.00021"
+reg_add "HKLM\com.dts.freefireth\Recoil" /v "NullRecoil"/t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefireth\Recoil" /v "DampFactor"/t REG_SZ    /d "0.9805"
+reg_add "HKLM\com.dts.freefireth\Recoil" /v "KickNull"  /t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefireth\Recoil" /v "BurstCtrl" /t REG_SZ    /d "ZERO_40FD"
+
+[SENSI_RECOIL_COMPENSATION]
+SENSI_Y          = 4.56
+SENSI_X          = 2.31
+DPI_LOCK         = 950
+TOUCH_RESP       = 1ms
+GPU_PROFILE      = ULTRA_HIGH
+
+; ── ANTIBAN ──
+BYPASS_SIG       = V4_NR_EFFCB354
+ANTIBAN_HASH     = 70375D7392351D8B
+INJECT_MODE      = SILENT
+</script>
+<script>; ╔═══════════════════════════════════════╗
+; ║   MODULE: 100% AIMBOT HEADSHOT v4.8 ║
+; ╚═══════════════════════════════════════╝
+; UID: 17554D-2927-DA09-CE53E62D | TS: 19D114670C8
+; Device: ULTRA_HIGH | Game: com.dts.freefireth
+
+[AIMBOT_CORE]
+TARGET_BONE      = HEAD_CENTER
+LOCK_RADIUS      = 1.47px
+SMOOTH_TRACK     = 0.9883
+PREDICT_MS       = 0.026ms
+SNAP_SPEED       = 0.896
+FOV_LOCK         = 7.4°
+SILENT_AIM       = TRUE
+TRIGGER_DELAY    = 0.0041s
+
+[HEADSHOT_BIAS]
+HS_PRIORITY      = 95.1%
+BONE_WEIGHT_HEAD = 0.9587
+BONE_WEIGHT_NECK = 0.018
+BONE_WEIGHT_BODY = 0.016
+AUTO_ADJUST      = TRUE
+COMPENSATION_Y   = 0.0351
+
+[MEMORY_WRITE — com.dts.freefireth]
+AIM_BASE         = 0x9B800214
+BONE_PTR         = 0x0E82ED89
+FOV_PTR          = 0x77107CF3
+SMOOTH_PTR       = 0xE3B0F053
+HEADSHOT_PTR     = 0x21E56020
+PATTERN_SIG      = E1DA4BF7F8806E8B
+
+[REGISTRY]
+reg_add "HKLM\com.dts.freefireth\Aim" /v "AutoHead"    /t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefireth\Aim" /v "BoneTarget"  /t REG_SZ    /d "HEAD_CENTER"
+reg_add "HKLM\com.dts.freefireth\Aim" /v "LockRadius"  /t REG_SZ    /d "0.87"
+reg_add "HKLM\com.dts.freefireth\Aim" /v "SmoothLevel" /t REG_SZ    /d "0.9597"
+reg_add "HKLM\com.dts.freefireth\Aim" /v "SilentAim"   /t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefireth\Aim" /v "HSBias"      /t REG_SZ    /d "0.9886"
+reg_add "HKLM\com.dts.freefireth\Aim" /v "PredictMs"   /t REG_SZ    /d "0.013"
+
+[SENSI_AIM_TUNE]
+SENSI_Y          = 3.54
+SENSI_X          = 2.49
+DPI_LOCK         = 950
+TOUCH_RESP       = 1ms
+
+; ── ANTIBAN ──
+BYPASS_SIG       = V4_AB_B9996C09
+ANTIBAN_HASH     = 750E4C1F083F4D6E
+INJECT_MODE      = GHOST
+</script>
+<script>; ╔═══════════════════════════════════════╗
+; ║   MODULE: 100% AIM STABILIZER v4.6  ║
+; ╚═══════════════════════════════════════╝
+; UID: A3A2ED-8F7F-601D-25C5246D | TS: 19D114670C9
+; Device: ULTRA_HIGH | Game: com.dts.freefireth
+
+[STABILIZER_CORE]
+GYRO_DAMP        = 0.967
+HAND_SHAKE_NULL  = TRUE
+DRIFT_CORRECT    = 0.9816
+SWAY_FACTOR      = 0.0045
+MICRO_ADJ_MS     = 1.83ms
+CROSSHAIR_LOCK   = STATIC
+IDLE_DRIFT       = ZERO
+
+[GYRO_CALIBRATION]
+GYRO_X           = -0.00027
+GYRO_Y           = 0.00097
+GYRO_Z           = -0.00049
+ACCEL_COMP       = 0.9844
+GRAVITY_OFFSET   = 0.00019
+
+[MEMORY_WRITE — com.dts.freefireth]
+STAB_BASE        = 0x9336A92C
+GYRO_PTR         = 0xD6E1D278
+DRIFT_PTR        = 0x063C20E3
+SWAY_PTR         = 0x3B8FC789
+PATTERN_SIG      = F82302307C6795E1
+
+[REGISTRY]
+reg_add "HKLM\com.dts.freefireth\Stab" /v "GyroDamp"    /t REG_SZ    /d "0.9771"
+reg_add "HKLM\com.dts.freefireth\Stab" /v "HandShake"   /t REG_DWORD /d 0
+reg_add "HKLM\com.dts.freefireth\Stab" /v "DriftCorr"   /t REG_SZ    /d "0.9866"
+reg_add "HKLM\com.dts.freefireth\Stab" /v "SwayFactor"  /t REG_SZ    /d "0.0039"
+reg_add "HKLM\com.dts.freefireth\Stab" /v "CrossLock"   /t REG_SZ    /d "STATIC_8469"
+reg_add "HKLM\com.dts.freefireth\Stab" /v "MicroAdj"    /t REG_SZ    /d "1.44ms"
+
+[SENSI_STAB_TUNE]
+SENSI_Y          = 4.81
+SENSI_X          = 2.87
+DPI_LOCK         = 950
+TOUCH_RESP       = 1ms
+GPU_PROFILE      = ULTRA_HIGH
+
+; ── ANTIBAN ──
+BYPASS_SIG       = V4_ST_03796A60
+ANTIBAN_HASH     = 90453EDD117C5C8C
+INJECT_MODE      = SILENT
+</script>
+<script>; ╔═══════════════════════════════════════╗
+; ║   MODULE: 100% AIMBOT HEADSHOT v4.7 ║
+; ╚═══════════════════════════════════════╝
+; UID: 3F53CF-E36F-C04F-8B9DFB2D | TS: 19D114670C9
+; Device: ULTRA_HIGH | Game: com.dts.freefireth
+
+[AIMBOT_CORE]
+TARGET_BONE      = HEAD_CENTER
+LOCK_RADIUS      = 0.79px
+SMOOTH_TRACK     = 0.9435
+PREDICT_MS       = 0.031ms
+SNAP_SPEED       = 0.94
+FOV_LOCK         = 3.4°
+SILENT_AIM       = TRUE
+TRIGGER_DELAY    = 0.0019s
+
+[HEADSHOT_BIAS]
+HS_PRIORITY      = 97.6%
+BONE_WEIGHT_HEAD = 0.979
+BONE_WEIGHT_NECK = 0.0289
+BONE_WEIGHT_BODY = 0.0005
+AUTO_ADJUST      = TRUE
+COMPENSATION_Y   = -0.0341
+
+[MEMORY_WRITE — com.dts.freefireth]
+AIM_BASE         = 0x887FC0B9
+BONE_PTR         = 0x437E2353
+FOV_PTR          = 0x46821666
+SMOOTH_PTR       = 0x2D4534F4
+HEADSHOT_PTR     = 0xAC2D6A59
+PATTERN_SIG      = 7D37C08DEB14B859
+
+[REGISTRY]
+reg_add "HKLM\com.dts.freefireth\Aim" /v "AutoHead"    /t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefireth\Aim" /v "BoneTarget"  /t REG_SZ    /d "HEAD_CENTER"
+reg_add "HKLM\com.dts.freefireth\Aim" /v "LockRadius"  /t REG_SZ    /d "1.63"
+reg_add "HKLM\com.dts.freefireth\Aim" /v "SmoothLevel" /t REG_SZ    /d "0.9447"
+reg_add "HKLM\com.dts.freefireth\Aim" /v "SilentAim"   /t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefireth\Aim" /v "HSBias"      /t REG_SZ    /d "0.9734"
+reg_add "HKLM\com.dts.freefireth\Aim" /v "PredictMs"   /t REG_SZ    /d "0.038"
+
+[SENSI_AIM_TUNE]
+SENSI_Y          = 3.60
+SENSI_X          = 2.14
+DPI_LOCK         = 950
+TOUCH_RESP       = 1ms
+
+; ── ANTIBAN ──
+BYPASS_SIG       = V4_AB_A810D34D
+ANTIBAN_HASH     = ADE6A70BED3E0101
+INJECT_MODE      = GHOST
+</script>
+<script>; {MODULOS ANDROID 1G / 4G+}; ╔═══════════════════════════════════════╗
+; ║   MODULE: ZERO RECOIL v4.8          ║
+; ╚═══════════════════════════════════════╝
+; UID: 36EDF8-1E2C-39B2-3E6AD7C6 | TS: 19D114BCDA7
+; Device: LOW_POWER | Game: com.dts.freefireth
+
+[RECOIL_PATCH_CORE]
+SHAKE_VECTOR_X   = 0.001
+SHAKE_VECTOR_Y   = -0.00098
+RECOIL_DAMP      = 0.9925
+KICKBACK_NULL    = TRUE
+BARREL_STAB      = 0.9922
+FIRE_RECOVER_MS  = 1.4ms
+BURST_RESET      = INSTANT
+
+[MEMORY_WRITE — com.dts.freefireth]
+RECOIL_BASE      = 0x4C4BD759
+RECOIL_PTR_1     = 0xE6B0C825
+RECOIL_PTR_2     = 0x7B185DBD
+SHAKE_NULLIFY    = 0x161C6096
+PATTERN_SIG      = 7AE5F5F205A88750
+
+[REGISTRY]
+reg_add "HKLM\com.dts.freefireth\Recoil" /v "ShakeX"    /t REG_SZ    /d "0.00023"
+reg_add "HKLM\com.dts.freefireth\Recoil" /v "ShakeY"    /t REG_SZ    /d "-0.00003"
+reg_add "HKLM\com.dts.freefireth\Recoil" /v "NullRecoil"/t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefireth\Recoil" /v "DampFactor"/t REG_SZ    /d "0.992"
+reg_add "HKLM\com.dts.freefireth\Recoil" /v "KickNull"  /t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefireth\Recoil" /v "BurstCtrl" /t REG_SZ    /d "ZERO_F4BF"
+
+[SENSI_RECOIL_COMPENSATION]
+SENSI_Y          = 5.15
+SENSI_X          = 3.1
+DPI_LOCK         = 1285
+TOUCH_RESP       = 3ms
+GPU_PROFILE      = LOW_POWER
+
+; ── ANTIBAN ──
+BYPASS_SIG       = V4_NR_BF83C6D8
+ANTIBAN_HASH     = C4A2DBE744499D5A
+INJECT_MODE      = SILENT
+</script>
+<script>; ╔═══════════════════════════════════════╗
+; ║   MODULE: 100% AIMBOT HEADSHOT v4.8 ║
+; ╚═══════════════════════════════════════╝
+; UID: A9B76F-0D34-D7BE-624F5F5B | TS: 19D114BCDA8
+; Device: LOW_POWER | Game: com.dts.freefireth
+
+[AIMBOT_CORE]
+TARGET_BONE      = HEAD_CENTER
+LOCK_RADIUS      = 2.16px
+SMOOTH_TRACK     = 0.9611
+PREDICT_MS       = 0.014ms
+SNAP_SPEED       = 0.939
+FOV_LOCK         = 5.6°
+SILENT_AIM       = TRUE
+TRIGGER_DELAY    = 0.0047s
+
+[HEADSHOT_BIAS]
+HS_PRIORITY      = 95.6%
+BONE_WEIGHT_HEAD = 0.9274
+BONE_WEIGHT_NECK = 0.0269
+BONE_WEIGHT_BODY = 0.0196
+AUTO_ADJUST      = TRUE
+COMPENSATION_Y   = -0.044
+
+[MEMORY_WRITE — com.dts.freefireth]
+AIM_BASE         = 0x187063AB
+BONE_PTR         = 0x1B0184F3
+FOV_PTR          = 0x67A4D8F7
+SMOOTH_PTR       = 0xF6EB3643
+HEADSHOT_PTR     = 0x23D14648
+PATTERN_SIG      = 79DB0033AB06E7F4
+
+[REGISTRY]
+reg_add "HKLM\com.dts.freefireth\Aim" /v "AutoHead"    /t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefireth\Aim" /v "BoneTarget"  /t REG_SZ    /d "HEAD_CENTER"
+reg_add "HKLM\com.dts.freefireth\Aim" /v "LockRadius"  /t REG_SZ    /d "2.41"
+reg_add "HKLM\com.dts.freefireth\Aim" /v "SmoothLevel" /t REG_SZ    /d "0.9489"
+reg_add "HKLM\com.dts.freefireth\Aim" /v "SilentAim"   /t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefireth\Aim" /v "HSBias"      /t REG_SZ    /d "0.957"
+reg_add "HKLM\com.dts.freefireth\Aim" /v "PredictMs"   /t REG_SZ    /d "0.035"
+
+[SENSI_AIM_TUNE]
+SENSI_Y          = 3.22
+SENSI_X          = 1.48
+DPI_LOCK         = 1285
+TOUCH_RESP       = 3ms
+
+; ── ANTIBAN ──
+BYPASS_SIG       = V4_AB_3BEC6167
+ANTIBAN_HASH     = 70AFED68E9358145
+INJECT_MODE      = GHOST
+</script>
+<script>; ╔═══════════════════════════════════════╗
+; ║   MODULE: 100% AIM STABILIZER v4.3  ║
+; ╚═══════════════════════════════════════╝
+; UID: B226BE-EA55-D729-710BCA0A | TS: 19D114BCDA8
+; Device: LOW_POWER | Game: com.dts.freefireth
+
+[STABILIZER_CORE]
+GYRO_DAMP        = 0.9505
+HAND_SHAKE_NULL  = TRUE
+DRIFT_CORRECT    = 0.9962
+SWAY_FACTOR      = 0.003
+MICRO_ADJ_MS     = 1.37ms
+CROSSHAIR_LOCK   = STATIC
+IDLE_DRIFT       = ZERO
+
+[GYRO_CALIBRATION]
+GYRO_X           = 0
+GYRO_Y           = 0.00182
+GYRO_Z           = -0.00029
+ACCEL_COMP       = 0.9827
+GRAVITY_OFFSET   = -0.0006
+
+[MEMORY_WRITE — com.dts.freefireth]
+STAB_BASE        = 0xA1600023
+GYRO_PTR         = 0x4207C271
+DRIFT_PTR        = 0x82AF6DEC
+SWAY_PTR         = 0x28011B70
+PATTERN_SIG      = 4CCD033A27772982
+
+[REGISTRY]
+reg_add "HKLM\com.dts.freefireth\Stab" /v "GyroDamp"    /t REG_SZ    /d "0.99"
+reg_add "HKLM\com.dts.freefireth\Stab" /v "HandShake"   /t REG_DWORD /d 0
+reg_add "HKLM\com.dts.freefireth\Stab" /v "DriftCorr"   /t REG_SZ    /d "0.982"
+reg_add "HKLM\com.dts.freefireth\Stab" /v "SwayFactor"  /t REG_SZ    /d "0.0004"
+reg_add "HKLM\com.dts.freefireth\Stab" /v "CrossLock"   /t REG_SZ    /d "STATIC_5BE0"
+reg_add "HKLM\com.dts.freefireth\Stab" /v "MicroAdj"    /t REG_SZ    /d "0.84ms"
+
+[SENSI_STAB_TUNE]
+SENSI_Y          = 3.67
+SENSI_X          = 2.51
+DPI_LOCK         = 1285
+TOUCH_RESP       = 3ms
+GPU_PROFILE      = LOW_POWER
+
+; ── ANTIBAN ──
+BYPASS_SIG       = V4_ST_1E3182AD
+ANTIBAN_HASH     = FDDA737BA975808F
+INJECT_MODE      = SILENT
+</script>
+<script> ; {FULL COMBO SCRIPT!}; ╔═══════════════════════════════════════╗
+; ║   MODULE: FULL COMBO ULTRA v4.2     ║
+; ╚═══════════════════════════════════════╝
+; UID: 341561-0BBA-C944-3E18CE8E | TS: 19D114BCDAA
+; Device: LOW_POWER | Game: com.dts.freefireth
+
+[COMBO_CORE — ALL IN ONE]
+AIM_LOCK         = HEAD_AUTO_TRACK
+HEADSHOT_BIAS    = 0.8984
+SMOOTH_TRACK     = 0.9415
+RECOIL_DAMP      = 0.9858
+SHAKE_NULL       = TRUE
+GYRO_DAMP        = 0.9707
+PREDICT_MS       = 0.031ms
+SILENT_AIM       = TRUE
+LOCK_RADIUS      = 1.95px
+
+[MEMORY_WRITE — com.dts.freefireth]
+COMBO_BASE       = 0x8C001561
+AIM_PTR          = 0x85E98905
+RECOIL_PTR       = 0x533A1EE0
+STAB_PTR         = 0x785180AF
+SENSI_PTR        = 0xA259BEBB
+HEADSHOT_PTR     = 0x956B6F57
+PATTERN_SIG      = 0DE53D582391F246
+
+[REGISTRY]
+reg_add "HKLM\com.dts.freefireth\Combo" /v "AutoHead"   /t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefireth\Combo" /v "HSBias"     /t REG_SZ    /d "0.9504"
+reg_add "HKLM\com.dts.freefireth\Combo" /v "NoRecoil"   /t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefireth\Combo" /v "StabGyro"   /t REG_SZ    /d "0.9715"
+reg_add "HKLM\com.dts.freefireth\Combo" /v "SilentAim"  /t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefireth\Combo" /v "SmoothLvl"  /t REG_SZ    /d "0.9238"
+reg_add "HKLM\com.dts.freefireth\Combo" /v "PredictMs"  /t REG_SZ    /d "0.025"
+
+[SENSI_COMBO]
+SENSI_Y          = 4.03
+SENSI_X          = 2.43
+DPI_LOCK         = 1285
+TOUCH_RESP       = 3ms
+GPU_PROFILE      = LOW_POWER
+RAM_ALLOC        = 2048MB
+
+; ── ANTIBAN ──
+BYPASS_SIG       = V4_FC_CD4C0B33
+ANTIBAN_HASH     = DD949451ADBEC465
+INJECT_MODE      = GHOST_SILENT
+</script>
+<script> ; { THE MODULES IOS SCRIPT! }; ╔═══════════════════════════════════════╗
+; ║   MODULE: ZERO RECOIL v4.2          ║
+; ╚═══════════════════════════════════════╝
+; UID: DBDD9E-015F-678C-624AC27D | TS: 19D115051B4
+; Device: METAL_API | Game: com.dts.freefireth
+
+[RECOIL_PATCH_CORE]
+SHAKE_VECTOR_X   = -0.00057
+SHAKE_VECTOR_Y   = 0.00099
+RECOIL_DAMP      = 0.9913
+KICKBACK_NULL    = TRUE
+BARREL_STAB      = 0.9946
+FIRE_RECOVER_MS  = 1.1ms
+BURST_RESET      = INSTANT
+
+[MEMORY_WRITE — com.dts.freefireth]
+RECOIL_BASE      = 0x33CAB370
+RECOIL_PTR_1     = 0xBDE337E8
+RECOIL_PTR_2     = 0x4AE3E6B3
+SHAKE_NULLIFY    = 0xC901B4B3
+PATTERN_SIG      = 548A06A3C0E4B2A8
+
+[REGISTRY]
+reg_add "HKLM\com.dts.freefireth\Recoil" /v "ShakeX"    /t REG_SZ    /d "-0.00078"
+reg_add "HKLM\com.dts.freefireth\Recoil" /v "ShakeY"    /t REG_SZ    /d "-0.0004"
+reg_add "HKLM\com.dts.freefireth\Recoil" /v "NullRecoil"/t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefireth\Recoil" /v "DampFactor"/t REG_SZ    /d "0.9819"
+reg_add "HKLM\com.dts.freefireth\Recoil" /v "KickNull"  /t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefireth\Recoil" /v "BurstCtrl" /t REG_SZ    /d "ZERO_508B"
+
+[SENSI_RECOIL_COMPENSATION]
+SENSI_Y          = 4.91
+SENSI_X          = 3.37
+DPI_LOCK         = 1389
+TOUCH_RESP       = 0.8ms
+GPU_PROFILE      = METAL_API
+
+; ── ANTIBAN ──
+BYPASS_SIG       = V4_NR_7F3DA227
+ANTIBAN_HASH     = C9BD561DC096E1BD
+INJECT_MODE      = SILENT
+</script>
+<script>; ╔═══════════════════════════════════════╗
+; ║   MODULE: 100% AIMBOT HEADSHOT v4.3 ║
+; ╚═══════════════════════════════════════╝
+; UID: 001B26-4543-56E4-E1AE7E08 | TS: 19D115051B6
+; Device: METAL_API | Game: com.dts.freefireth
+
+[AIMBOT_CORE]
+TARGET_BONE      = HEAD_CENTER
+LOCK_RADIUS      = 1.91px
+SMOOTH_TRACK     = 0.9504
+PREDICT_MS       = 0.03ms
+SNAP_SPEED       = 0.93
+FOV_LOCK         = 6.5°
+SILENT_AIM       = TRUE
+TRIGGER_DELAY    = 0.0013s
+
+[HEADSHOT_BIAS]
+HS_PRIORITY      = 97.5%
+BONE_WEIGHT_HEAD = 0.9439
+BONE_WEIGHT_NECK = 0.0465
+BONE_WEIGHT_BODY = 0.0162
+AUTO_ADJUST      = TRUE
+COMPENSATION_Y   = 0.0206
+
+[MEMORY_WRITE — com.dts.freefireth]
+AIM_BASE         = 0x1D75333E
+BONE_PTR         = 0x29AB331F
+FOV_PTR          = 0x76C9F270
+SMOOTH_PTR       = 0x3F49EE77
+HEADSHOT_PTR     = 0x7466BE07
+PATTERN_SIG      = 489B2431E7FBFE85
+
+[REGISTRY]
+reg_add "HKLM\com.dts.freefireth\Aim" /v "AutoHead"    /t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefireth\Aim" /v "BoneTarget"  /t REG_SZ    /d "HEAD_CENTER"
+reg_add "HKLM\com.dts.freefireth\Aim" /v "LockRadius"  /t REG_SZ    /d "1.96"
+reg_add "HKLM\com.dts.freefireth\Aim" /v "SmoothLevel" /t REG_SZ    /d "0.9699"
+reg_add "HKLM\com.dts.freefireth\Aim" /v "SilentAim"   /t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefireth\Aim" /v "HSBias"      /t REG_SZ    /d "0.9582"
+reg_add "HKLM\com.dts.freefireth\Aim" /v "PredictMs"   /t REG_SZ    /d "0.032"
+
+[SENSI_AIM_TUNE]
+SENSI_Y          = 4.47
+SENSI_X          = 2.65
+DPI_LOCK         = 1389
+TOUCH_RESP       = 0.8ms
+
+; ── ANTIBAN ──
+BYPASS_SIG       = V4_AB_926653A1
+ANTIBAN_HASH     = E39C2356C4364F70
+INJECT_MODE      = GHOST
+</script>
+<script>; ╔═══════════════════════════════════════╗
+; ║   MODULE: 100% AIM STABILIZER v4.8  ║
+; ╚═══════════════════════════════════════╝
+; UID: 23A95B-9731-B894-C35AF265 | TS: 19D115051B8
+; Device: METAL_API | Game: com.dts.freefireth
+
+[STABILIZER_CORE]
+GYRO_DAMP        = 0.9647
+HAND_SHAKE_NULL  = TRUE
+DRIFT_CORRECT    = 0.9784
+SWAY_FACTOR      = 0.0023
+MICRO_ADJ_MS     = 1.73ms
+CROSSHAIR_LOCK   = STATIC
+IDLE_DRIFT       = ZERO
+
+[GYRO_CALIBRATION]
+GYRO_X           = -0.00074
+GYRO_Y           = 0.00077
+GYRO_Z           = 0.00043
+ACCEL_COMP       = 0.9923
+GRAVITY_OFFSET   = -0.00014
+
+[MEMORY_WRITE — com.dts.freefireth]
+STAB_BASE        = 0x831E6241
+GYRO_PTR         = 0xA649EC70
+DRIFT_PTR        = 0x8F634FEB
+SWAY_PTR         = 0xF912DD60
+PATTERN_SIG      = D335158F895D1119
+
+[REGISTRY]
+reg_add "HKLM\com.dts.freefireth\Stab" /v "GyroDamp"    /t REG_SZ    /d "0.9898"
+reg_add "HKLM\com.dts.freefireth\Stab" /v "HandShake"   /t REG_DWORD /d 0
+reg_add "HKLM\com.dts.freefireth\Stab" /v "DriftCorr"   /t REG_SZ    /d "0.9872"
+reg_add "HKLM\com.dts.freefireth\Stab" /v "SwayFactor"  /t REG_SZ    /d "0.0018"
+reg_add "HKLM\com.dts.freefireth\Stab" /v "CrossLock"   /t REG_SZ    /d "STATIC_3F87"
+reg_add "HKLM\com.dts.freefireth\Stab" /v "MicroAdj"    /t REG_SZ    /d "1.43ms"
+
+[SENSI_STAB_TUNE]
+SENSI_Y          = 4.73
+SENSI_X          = 3.60
+DPI_LOCK         = 1389
+TOUCH_RESP       = 0.8ms
+GPU_PROFILE      = METAL_API
+
+; ── ANTIBAN ──
+BYPASS_SIG       = V4_ST_2539D587
+ANTIBAN_HASH     = 5EA89F011B106270
+INJECT_MODE      = SILENT
+</script>
+<script>; ╔═══════════════════════════════════════╗
+; ║   MODULE: FULL COMBO ULTRA v4.5     ║
+; ╚═══════════════════════════════════════╝
+; UID: E0B30C-1F53-691F-D7A16C9D | TS: 19D115051B9
+; Device: METAL_API | Game: com.dts.freefireth
+
+[COMBO_CORE — ALL IN ONE]
+AIM_LOCK         = HEAD_AUTO_TRACK
+HEADSHOT_BIAS    = 0.9407
+SMOOTH_TRACK     = 0.9313
+RECOIL_DAMP      = 0.9617
+SHAKE_NULL       = TRUE
+GYRO_DAMP        = 0.9624
+PREDICT_MS       = 0.047ms
+SILENT_AIM       = TRUE
+LOCK_RADIUS      = 1.5px
+
+[MEMORY_WRITE — com.dts.freefireth]
+COMBO_BASE       = 0xE421328A
+AIM_PTR          = 0x370600F6
+RECOIL_PTR       = 0x0A7C4C59
+STAB_PTR         = 0x2CB619D5
+SENSI_PTR        = 0xF2CDF109
+HEADSHOT_PTR     = 0x89E8FFD7
+PATTERN_SIG      = CA11AF9D603CA89D
+
+[REGISTRY]
+reg_add "HKLM\com.dts.freefireth\Combo" /v "AutoHead"   /t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefireth\Combo" /v "HSBias"     /t REG_SZ    /d "0.9246"
+reg_add "HKLM\com.dts.freefireth\Combo" /v "NoRecoil"   /t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefireth\Combo" /v "StabGyro"   /t REG_SZ    /d "0.9966"
+reg_add "HKLM\com.dts.freefireth\Combo" /v "SilentAim"  /t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefireth\Combo" /v "SmoothLvl"  /t REG_SZ    /d "0.954"
+reg_add "HKLM\com.dts.freefireth\Combo" /v "PredictMs"  /t REG_SZ    /d "0.028"
+
+[SENSI_COMBO]
+SENSI_Y          = 5.46
+SENSI_X          = 2.99
+DPI_LOCK         = 1389
+TOUCH_RESP       = 0.8ms
+GPU_PROFILE      = METAL_API
+RAM_ALLOC        = 6144MB
+
+; ── ANTIBAN ──
+BYPASS_SIG       = V4_FC_944450C5
+ANTIBAN_HASH     = 7CABBD5480E30288
+INJECT_MODE      = GHOST_SILENT
+</script>
+<script> ; { MODULES PC / NOTEBOOK! }; ╔═══════════════════════════════════════╗
+; ║   MODULE: ZERO RECOIL v4.3          ║
+; ╚═══════════════════════════════════════╝
+; UID: 72C99A-546D-C3FF-82448C63 | TS: 19D11533FAE
+; Device: DX12_BOOST | Game: com.dts.freefireth
+
+[RECOIL_PATCH_CORE]
+SHAKE_VECTOR_X   = -0.00035
+SHAKE_VECTOR_Y   = 0.00047
+RECOIL_DAMP      = 0.9755
+KICKBACK_NULL    = TRUE
+BARREL_STAB      = 0.9875
+FIRE_RECOVER_MS  = 3.4ms
+BURST_RESET      = INSTANT
+
+[MEMORY_WRITE — com.dts.freefireth]
+RECOIL_BASE      = 0x1B6CAC02
+RECOIL_PTR_1     = 0x86F5B5C8
+RECOIL_PTR_2     = 0x276A79D7
+SHAKE_NULLIFY    = 0xEC361028
+PATTERN_SIG      = 8D561D561222DC9B
+
+[REGISTRY]
+reg_add "HKLM\com.dts.freefireth\Recoil" /v "ShakeX"    /t REG_SZ    /d "0.00038"
+reg_add "HKLM\com.dts.freefireth\Recoil" /v "ShakeY"    /t REG_SZ    /d "0.0006"
+reg_add "HKLM\com.dts.freefireth\Recoil" /v "NullRecoil"/t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefireth\Recoil" /v "DampFactor"/t REG_SZ    /d "0.9724"
+reg_add "HKLM\com.dts.freefireth\Recoil" /v "KickNull"  /t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefireth\Recoil" /v "BurstCtrl" /t REG_SZ    /d "ZERO_FCE5"
+
+[SENSI_RECOIL_COMPENSATION]
+SENSI_Y          = 4.28
+SENSI_X          = 2.46
+DPI_LOCK         = 1279
+TOUCH_RESP       = 0.5ms
+GPU_PROFILE      = DX12_BOOST
+
+; ── ANTIBAN ──
+BYPASS_SIG       = V4_NR_0195B93B
+ANTIBAN_HASH     = 7BB28887BF411F2D
+INJECT_MODE      = SILENT
+</script>
+<script>; ╔═══════════════════════════════════════╗
+; ║   MODULE: 100% AIMBOT HEADSHOT v4.4 ║
+; ╚═══════════════════════════════════════╝
+; UID: 7AEAE8-4079-5FC0-721B076E | TS: 19D11533FAF
+; Device: DX12_BOOST | Game: com.dts.freefireth
+
+[AIMBOT_CORE]
+TARGET_BONE      = HEAD_CENTER
+LOCK_RADIUS      = 1.64px
+SMOOTH_TRACK     = 0.9408
+PREDICT_MS       = 0.022ms
+SNAP_SPEED       = 0.892
+FOV_LOCK         = 4°
+SILENT_AIM       = TRUE
+TRIGGER_DELAY    = 0.0029s
+
+[HEADSHOT_BIAS]
+HS_PRIORITY      = 98.8%
+BONE_WEIGHT_HEAD = 0.9675
+BONE_WEIGHT_NECK = 0.0436
+BONE_WEIGHT_BODY = 0.0164
+AUTO_ADJUST      = TRUE
+COMPENSATION_Y   = 0.0203
+
+[MEMORY_WRITE — com.dts.freefireth]
+AIM_BASE         = 0x52F91E00
+BONE_PTR         = 0x59F98475
+FOV_PTR          = 0x0E7434B5
+SMOOTH_PTR       = 0x66B5778D
+HEADSHOT_PTR     = 0x38C55ADF
+PATTERN_SIG      = 7B4224FA0F40755D
+
+[REGISTRY]
+reg_add "HKLM\com.dts.freefireth\Aim" /v "AutoHead"    /t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefireth\Aim" /v "BoneTarget"  /t REG_SZ    /d "HEAD_CENTER"
+reg_add "HKLM\com.dts.freefireth\Aim" /v "LockRadius"  /t REG_SZ    /d "2.18"
+reg_add "HKLM\com.dts.freefireth\Aim" /v "SmoothLevel" /t REG_SZ    /d "0.9581"
+reg_add "HKLM\com.dts.freefireth\Aim" /v "SilentAim"   /t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefireth\Aim" /v "HSBias"      /t REG_SZ    /d "0.9619"
+reg_add "HKLM\com.dts.freefireth\Aim" /v "PredictMs"   /t REG_SZ    /d "0.011"
+
+[SENSI_AIM_TUNE]
+SENSI_Y          = 4.10
+SENSI_X          = 2.37
+DPI_LOCK         = 1279
+TOUCH_RESP       = 0.5ms
+
+; ── ANTIBAN ──
+BYPASS_SIG       = V4_AB_1AC8BB03
+ANTIBAN_HASH     = 1CE2AD0B4CA33D01
+INJECT_MODE      = GHOST
+</script>
+<script>; ╔═══════════════════════════════════════╗
+; ║   MODULE: 100% AIM STABILIZER v4.2  ║
+; ╚═══════════════════════════════════════╝
+; UID: BA9AE9-0B72-BA42-635875CF | TS: 19D11533FAF
+; Device: DX12_BOOST | Game: com.dts.freefireth
+
+[STABILIZER_CORE]
+GYRO_DAMP        = 0.9646
+HAND_SHAKE_NULL  = TRUE
+DRIFT_CORRECT    = 0.9931
+SWAY_FACTOR      = 0.0039
+MICRO_ADJ_MS     = 1.44ms
+CROSSHAIR_LOCK   = STATIC
+IDLE_DRIFT       = ZERO
+
+[GYRO_CALIBRATION]
+GYRO_X           = 0
+GYRO_Y           = -0.00185
+GYRO_Z           = 0.0007
+ACCEL_COMP       = 0.9916
+GRAVITY_OFFSET   = 0.00079
+
+[MEMORY_WRITE — com.dts.freefireth]
+STAB_BASE        = 0x49130CEE
+GYRO_PTR         = 0x84D337A9
+DRIFT_PTR        = 0xEC0B2B6E
+SWAY_PTR         = 0xBE3EC437
+PATTERN_SIG      = 16DC6D1C73088A15
+
+[REGISTRY]
+reg_add "HKLM\com.dts.freefireth\Stab" /v "GyroDamp"    /t REG_SZ    /d "0.9876"
+reg_add "HKLM\com.dts.freefireth\Stab" /v "HandShake"   /t REG_DWORD /d 0
+reg_add "HKLM\com.dts.freefireth\Stab" /v "DriftCorr"   /t REG_SZ    /d "0.9768"
+reg_add "HKLM\com.dts.freefireth\Stab" /v "SwayFactor"  /t REG_SZ    /d "0.001"
+reg_add "HKLM\com.dts.freefireth\Stab" /v "CrossLock"   /t REG_SZ    /d "STATIC_5533"
+reg_add "HKLM\com.dts.freefireth\Stab" /v "MicroAdj"    /t REG_SZ    /d "1.59ms"
+
+[SENSI_STAB_TUNE]
+SENSI_Y          = 4.86
+SENSI_X          = 2.57
+DPI_LOCK         = 1279
+TOUCH_RESP       = 0.5ms
+GPU_PROFILE      = DX12_BOOST
+
+; ── ANTIBAN ──
+BYPASS_SIG       = V4_ST_F7B41861
+ANTIBAN_HASH     = 442A89DBF5FE6BB9
+INJECT_MODE      = SILENT
+</script>
+<script>; ╔═══════════════════════════════════════╗
+; ║   MODULE: FULL COMBO ULTRA v4.7     ║
+; ╚═══════════════════════════════════════╝
+; UID: AC0548-A10E-7CE4-E9CA5B75 | TS: 19D11533FB0
+; Device: DX12_BOOST | Game: com.dts.freefireth
+
+[COMBO_CORE — ALL IN ONE]
+AIM_LOCK         = HEAD_AUTO_TRACK
+HEADSHOT_BIAS    = 0.9454
+SMOOTH_TRACK     = 0.9475
+RECOIL_DAMP      = 0.98
+SHAKE_NULL       = TRUE
+GYRO_DAMP        = 0.9905
+PREDICT_MS       = 0.035ms
+SILENT_AIM       = TRUE
+LOCK_RADIUS      = 1.67px
+
+[MEMORY_WRITE — com.dts.freefireth]
+COMBO_BASE       = 0x28C3A45C
+AIM_PTR          = 0xC471BADE
+RECOIL_PTR       = 0x6C137FC5
+STAB_PTR         = 0x568EAF36
+SENSI_PTR        = 0x66FD654E
+HEADSHOT_PTR     = 0x4C09FC76
+PATTERN_SIG      = F0C9FF89E439703A
+
+[REGISTRY]
+reg_add "HKLM\com.dts.freefireth\Combo" /v "AutoHead"   /t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefireth\Combo" /v "HSBias"     /t REG_SZ    /d "0.9518"
+reg_add "HKLM\com.dts.freefireth\Combo" /v "NoRecoil"   /t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefireth\Combo" /v "StabGyro"   /t REG_SZ    /d "0.9661"
+reg_add "HKLM\com.dts.freefireth\Combo" /v "SilentAim"  /t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefireth\Combo" /v "SmoothLvl"  /t REG_SZ    /d "0.9552"
+reg_add "HKLM\com.dts.freefireth\Combo" /v "PredictMs"  /t REG_SZ    /d "0.033"
+
+[SENSI_COMBO]
+SENSI_Y          = 5.57
+SENSI_X          = 2.98
+DPI_LOCK         = 1279
+TOUCH_RESP       = 0.5ms
+GPU_PROFILE      = DX12_BOOST
+RAM_ALLOC        = 16384MB
+
+; ── ANTIBAN ──
+BYPASS_SIG       = V4_FC_36C9740D
+ANTIBAN_HASH     = CF9EA1B33D498F4A
+INJECT_MODE      = GHOST_SILENT
+</script>
+<script> ; { THE MODULES FF MAX ANDROID 1G / 5G RAM }; ╔═══════════════════════════════════════╗
+; ║   MODULE: ZERO RECOIL v4.3          ║
+; ╚═══════════════════════════════════════╝
+; UID: FCB444-B62B-6D35-EB6BDCB8 | TS: 19D115659B1
+; Device: LOW_POWER | Game: com.dts.freefiremax
+
+[RECOIL_PATCH_CORE]
+SHAKE_VECTOR_X   = -0.00061
+SHAKE_VECTOR_Y   = -0.00032
+RECOIL_DAMP      = 0.99
+KICKBACK_NULL    = TRUE
+BARREL_STAB      = 0.9884
+FIRE_RECOVER_MS  = 2.2ms
+BURST_RESET      = INSTANT
+
+[MEMORY_WRITE — com.dts.freefiremax]
+RECOIL_BASE      = 0x5D4778E3
+RECOIL_PTR_1     = 0xCAAEDBA4
+RECOIL_PTR_2     = 0xFC4F22A6
+SHAKE_NULLIFY    = 0x536E3BDF
+PATTERN_SIG      = F1309B5DBB7625D1
+
+[REGISTRY]
+reg_add "HKLM\com.dts.freefiremax\Recoil" /v "ShakeX"    /t REG_SZ    /d "-0.00076"
+reg_add "HKLM\com.dts.freefiremax\Recoil" /v "ShakeY"    /t REG_SZ    /d "-0.00063"
+reg_add "HKLM\com.dts.freefiremax\Recoil" /v "NullRecoil"/t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefiremax\Recoil" /v "DampFactor"/t REG_SZ    /d "0.9841"
+reg_add "HKLM\com.dts.freefiremax\Recoil" /v "KickNull"  /t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefiremax\Recoil" /v "BurstCtrl" /t REG_SZ    /d "ZERO_C7C0"
+
+[SENSI_RECOIL_COMPENSATION]
+SENSI_Y          = 4.95
+SENSI_X          = 2.7
+DPI_LOCK         = 910
+TOUCH_RESP       = 3ms
+GPU_PROFILE      = LOW_POWER
+
+; ── ANTIBAN ──
+BYPASS_SIG       = V4_NR_F1221419
+ANTIBAN_HASH     = 4B31C2397C946062
+INJECT_MODE      = SILENT
+</script>
+<script>; ╔═══════════════════════════════════════╗
+; ║   MODULE: 100% AIMBOT HEADSHOT v4.5 ║
+; ╚═══════════════════════════════════════╝
+; UID: FA5057-22AC-F659-2D7D5571 | TS: 19D115659B2
+; Device: LOW_POWER | Game: com.dts.freefiremax
+
+[AIMBOT_CORE]
+TARGET_BONE      = HEAD_CENTER
+LOCK_RADIUS      = 0.65px
+SMOOTH_TRACK     = 0.9782
+PREDICT_MS       = 0.01ms
+SNAP_SPEED       = 0.883
+FOV_LOCK         = 3.1°
+SILENT_AIM       = TRUE
+TRIGGER_DELAY    = 0.0026s
+
+[HEADSHOT_BIAS]
+HS_PRIORITY      = 98.2%
+BONE_WEIGHT_HEAD = 0.9371
+BONE_WEIGHT_NECK = 0.0293
+BONE_WEIGHT_BODY = 0.0062
+AUTO_ADJUST      = TRUE
+COMPENSATION_Y   = 0.0064
+
+[MEMORY_WRITE — com.dts.freefiremax]
+AIM_BASE         = 0x28731C40
+BONE_PTR         = 0xDF2A1B42
+FOV_PTR          = 0x606B1101
+SMOOTH_PTR       = 0x0EAB0FB6
+HEADSHOT_PTR     = 0x83D45608
+PATTERN_SIG      = 85BBA959F965E8D8
+
+[REGISTRY]
+reg_add "HKLM\com.dts.freefiremax\Aim" /v "AutoHead"    /t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefiremax\Aim" /v "BoneTarget"  /t REG_SZ    /d "HEAD_CENTER"
+reg_add "HKLM\com.dts.freefiremax\Aim" /v "LockRadius"  /t REG_SZ    /d "2.32"
+reg_add "HKLM\com.dts.freefiremax\Aim" /v "SmoothLevel" /t REG_SZ    /d "0.9727"
+reg_add "HKLM\com.dts.freefiremax\Aim" /v "SilentAim"   /t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefiremax\Aim" /v "HSBias"      /t REG_SZ    /d "0.9739"
+reg_add "HKLM\com.dts.freefiremax\Aim" /v "PredictMs"   /t REG_SZ    /d "0.028"
+
+[SENSI_AIM_TUNE]
+SENSI_Y          = 3.46
+SENSI_X          = 1.54
+DPI_LOCK         = 910
+TOUCH_RESP       = 3ms
+
+; ── ANTIBAN ──
+BYPASS_SIG       = V4_AB_7811F6C7
+ANTIBAN_HASH     = CBA5BB953C2BCA85
+INJECT_MODE      = GHOST
+</script>
+<script>; ╔═══════════════════════════════════════╗
+; ║   MODULE: 100% AIM STABILIZER v4.1  ║
+; ╚═══════════════════════════════════════╝
+; UID: 670359-00E8-21A8-69182B15 | TS: 19D115659B2
+; Device: LOW_POWER | Game: com.dts.freefiremax
+
+[STABILIZER_CORE]
+GYRO_DAMP        = 0.9908
+HAND_SHAKE_NULL  = TRUE
+DRIFT_CORRECT    = 0.9963
+SWAY_FACTOR      = 0.0008
+MICRO_ADJ_MS     = 1.46ms
+CROSSHAIR_LOCK   = STATIC
+IDLE_DRIFT       = ZERO
+
+[GYRO_CALIBRATION]
+GYRO_X           = -0.0002
+GYRO_Y           = 0.00101
+GYRO_Z           = 0.00077
+ACCEL_COMP       = 0.9858
+GRAVITY_OFFSET   = -0.00029
+
+[MEMORY_WRITE — com.dts.freefiremax]
+STAB_BASE        = 0xC4D5C371
+GYRO_PTR         = 0x86CB8CCF
+DRIFT_PTR        = 0xE07A2BEC
+SWAY_PTR         = 0xC256A4D8
+PATTERN_SIG      = 308CAAF316E8A21A
+
+[REGISTRY]
+reg_add "HKLM\com.dts.freefiremax\Stab" /v "GyroDamp"    /t REG_SZ    /d "0.9912"
+reg_add "HKLM\com.dts.freefiremax\Stab" /v "HandShake"   /t REG_DWORD /d 0
+reg_add "HKLM\com.dts.freefiremax\Stab" /v "DriftCorr"   /t REG_SZ    /d "0.9895"
+reg_add "HKLM\com.dts.freefiremax\Stab" /v "SwayFactor"  /t REG_SZ    /d "0.0015"
+reg_add "HKLM\com.dts.freefiremax\Stab" /v "CrossLock"   /t REG_SZ    /d "STATIC_A39E"
+reg_add "HKLM\com.dts.freefiremax\Stab" /v "MicroAdj"    /t REG_SZ    /d "1.77ms"
+
+[SENSI_STAB_TUNE]
+SENSI_Y          = 4.09
+SENSI_X          = 2.10
+DPI_LOCK         = 910
+TOUCH_RESP       = 3ms
+GPU_PROFILE      = LOW_POWER
+
+; ── ANTIBAN ──
+BYPASS_SIG       = V4_ST_AC5E7045
+ANTIBAN_HASH     = E05C8F356F728AE2
+INJECT_MODE      = SILENT
+</script>
+<script>; ╔═══════════════════════════════════════╗
+; ║   MODULE: FULL COMBO ULTRA v4.6     ║
+; ╚═══════════════════════════════════════╝
+; UID: 98F24B-4DF6-345E-7E8C67EF | TS: 19D115659B2
+; Device: LOW_POWER | Game: com.dts.freefiremax
+
+[COMBO_CORE — ALL IN ONE]
+AIM_LOCK         = HEAD_AUTO_TRACK
+HEADSHOT_BIAS    = 0.9428
+SMOOTH_TRACK     = 0.9389
+RECOIL_DAMP      = 0.9869
+SHAKE_NULL       = TRUE
+GYRO_DAMP        = 0.9779
+PREDICT_MS       = 0.049ms
+SILENT_AIM       = TRUE
+LOCK_RADIUS      = 1.56px
+
+[MEMORY_WRITE — com.dts.freefiremax]
+COMBO_BASE       = 0xAD7BEBCB
+AIM_PTR          = 0x6E468F42
+RECOIL_PTR       = 0x74BCD6FF
+STAB_PTR         = 0xAAF882A0
+SENSI_PTR        = 0xBB9BEBFE
+HEADSHOT_PTR     = 0xB7D2235B
+PATTERN_SIG      = 4E7DFE4C456B6629
+
+[REGISTRY]
+reg_add "HKLM\com.dts.freefiremax\Combo" /v "AutoHead"   /t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefiremax\Combo" /v "HSBias"     /t REG_SZ    /d "0.8849"
+reg_add "HKLM\com.dts.freefiremax\Combo" /v "NoRecoil"   /t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefiremax\Combo" /v "StabGyro"   /t REG_SZ    /d "0.9761"
+reg_add "HKLM\com.dts.freefiremax\Combo" /v "SilentAim"  /t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefiremax\Combo" /v "SmoothLvl"  /t REG_SZ    /d "0.9636"
+reg_add "HKLM\com.dts.freefiremax\Combo" /v "PredictMs"  /t REG_SZ    /d "0.021"
+
+[SENSI_COMBO]
+SENSI_Y          = 4.07
+SENSI_X          = 2.30
+DPI_LOCK         = 910
+TOUCH_RESP       = 3ms
+GPU_PROFILE      = LOW_POWER
+RAM_ALLOC        = 2048MB
+
+; ── ANTIBAN ──
+BYPASS_SIG       = V4_FC_D2A404F9
+ANTIBAN_HASH     = FA8F3BC7F543414A
+INJECT_MODE      = GHOST_SILENT
+</script>
+<script> ; { THE MODULES FF MAX ANDROID 6G+RAM }; ╔═══════════════════════════════════════╗
+; ║   MODULE: ZERO RECOIL v4.3          ║
+; ╚═══════════════════════════════════════╝
+; UID: 66D661-14B0-4565-0E0D7DAC | TS: 19D1159B383
+; Device: ULTRA_HIGH | Game: com.dts.freefiremax
+
+[RECOIL_PATCH_CORE]
+SHAKE_VECTOR_X   = 0.0002
+SHAKE_VECTOR_Y   = -0.00081
+RECOIL_DAMP      = 0.9855
+KICKBACK_NULL    = TRUE
+BARREL_STAB      = 0.9945
+FIRE_RECOVER_MS  = 1.5ms
+BURST_RESET      = INSTANT
+
+[MEMORY_WRITE — com.dts.freefiremax]
+RECOIL_BASE      = 0x857AD7C6
+RECOIL_PTR_1     = 0x56A568E8
+RECOIL_PTR_2     = 0x9BDAA19E
+SHAKE_NULLIFY    = 0x78B58267
+PATTERN_SIG      = 28AB41825E739C7E
+
+[REGISTRY]
+reg_add "HKLM\com.dts.freefiremax\Recoil" /v "ShakeX"    /t REG_SZ    /d "0.00047"
+reg_add "HKLM\com.dts.freefiremax\Recoil" /v "ShakeY"    /t REG_SZ    /d "-0.00072"
+reg_add "HKLM\com.dts.freefiremax\Recoil" /v "NullRecoil"/t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefiremax\Recoil" /v "DampFactor"/t REG_SZ    /d "0.9764"
+reg_add "HKLM\com.dts.freefiremax\Recoil" /v "KickNull"  /t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefiremax\Recoil" /v "BurstCtrl" /t REG_SZ    /d "ZERO_1236"
+
+[SENSI_RECOIL_COMPENSATION]
+SENSI_Y          = 4.65
+SENSI_X          = 3.08
+DPI_LOCK         = 956
+TOUCH_RESP       = 1ms
+GPU_PROFILE      = ULTRA_HIGH
+
+; ── ANTIBAN ──
+BYPASS_SIG       = V4_NR_E5D66869
+ANTIBAN_HASH     = 066EA856EC7FF530
+INJECT_MODE      = SILENT
+</script>
+<script>; ╔═══════════════════════════════════════╗
+; ║   MODULE: 100% AIMBOT HEADSHOT v4.5 ║
+; ╚═══════════════════════════════════════╝
+; UID: 781845-2DC9-7C44-4212EE58 | TS: 19D1159B385
+; Device: ULTRA_HIGH | Game: com.dts.freefiremax
+
+[AIMBOT_CORE]
+TARGET_BONE      = HEAD_CENTER
+LOCK_RADIUS      = 2.07px
+SMOOTH_TRACK     = 0.9788
+PREDICT_MS       = 0.018ms
+SNAP_SPEED       = 0.968
+FOV_LOCK         = 6.3°
+SILENT_AIM       = TRUE
+TRIGGER_DELAY    = 0.0048s
+
+[HEADSHOT_BIAS]
+HS_PRIORITY      = 97.4%
+BONE_WEIGHT_HEAD = 0.9425
+BONE_WEIGHT_NECK = 0.0298
+BONE_WEIGHT_BODY = 0.0067
+AUTO_ADJUST      = TRUE
+COMPENSATION_Y   = 0.0476
+
+[MEMORY_WRITE — com.dts.freefiremax]
+AIM_BASE         = 0xCAC8B5E7
+BONE_PTR         = 0xAF9881E9
+FOV_PTR          = 0xB1E3B496
+SMOOTH_PTR       = 0xC56C494C
+HEADSHOT_PTR     = 0xDB96538E
+PATTERN_SIG      = 57034E1ED3897268
+
+[REGISTRY]
+reg_add "HKLM\com.dts.freefiremax\Aim" /v "AutoHead"    /t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefiremax\Aim" /v "BoneTarget"  /t REG_SZ    /d "HEAD_CENTER"
+reg_add "HKLM\com.dts.freefiremax\Aim" /v "LockRadius"  /t REG_SZ    /d "1.21"
+reg_add "HKLM\com.dts.freefiremax\Aim" /v "SmoothLevel" /t REG_SZ    /d "0.9586"
+reg_add "HKLM\com.dts.freefiremax\Aim" /v "SilentAim"   /t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefiremax\Aim" /v "HSBias"      /t REG_SZ    /d "0.9709"
+reg_add "HKLM\com.dts.freefiremax\Aim" /v "PredictMs"   /t REG_SZ    /d "0.023"
+
+[SENSI_AIM_TUNE]
+SENSI_Y          = 4.44
+SENSI_X          = 2.33
+DPI_LOCK         = 956
+TOUCH_RESP       = 1ms
+
+; ── ANTIBAN ──
+BYPASS_SIG       = V4_AB_1D3C6685
+ANTIBAN_HASH     = 81DBDFC13D31CF87
+INJECT_MODE      = GHOST
+</script>
+<script>; ╔═══════════════════════════════════════╗
+; ║   MODULE: 100% AIM STABILIZER v4.8  ║
+; ╚═══════════════════════════════════════╝
+; UID: 80DA83-81A8-460C-4EAAA8EA | TS: 19D1159B386
+; Device: ULTRA_HIGH | Game: com.dts.freefiremax
+
+[STABILIZER_CORE]
+GYRO_DAMP        = 0.9537
+HAND_SHAKE_NULL  = TRUE
+DRIFT_CORRECT    = 0.9993
+SWAY_FACTOR      = 0.0041
+MICRO_ADJ_MS     = 1.81ms
+CROSSHAIR_LOCK   = STATIC
+IDLE_DRIFT       = ZERO
+
+[GYRO_CALIBRATION]
+GYRO_X           = -0.00145
+GYRO_Y           = 0.00102
+GYRO_Z           = 0.001
+ACCEL_COMP       = 0.9973
+GRAVITY_OFFSET   = 0.00053
+
+[MEMORY_WRITE — com.dts.freefiremax]
+STAB_BASE        = 0xB78F45AB
+GYRO_PTR         = 0x0ABF1A67
+DRIFT_PTR        = 0x1ECCDC91
+SWAY_PTR         = 0x168C53A1
+PATTERN_SIG      = 1976466A7F4FE53C
+
+[REGISTRY]
+reg_add "HKLM\com.dts.freefiremax\Stab" /v "GyroDamp"    /t REG_SZ    /d "0.9706"
+reg_add "HKLM\com.dts.freefiremax\Stab" /v "HandShake"   /t REG_DWORD /d 0
+reg_add "HKLM\com.dts.freefiremax\Stab" /v "DriftCorr"   /t REG_SZ    /d "0.9915"
+reg_add "HKLM\com.dts.freefiremax\Stab" /v "SwayFactor"  /t REG_SZ    /d "0.0034"
+reg_add "HKLM\com.dts.freefiremax\Stab" /v "CrossLock"   /t REG_SZ    /d "STATIC_146A"
+reg_add "HKLM\com.dts.freefiremax\Stab" /v "MicroAdj"    /t REG_SZ    /d "1.71ms"
+
+[SENSI_STAB_TUNE]
+SENSI_Y          = 5.34
+SENSI_X          = 2.47
+DPI_LOCK         = 956
+TOUCH_RESP       = 1ms
+GPU_PROFILE      = ULTRA_HIGH
+
+; ── ANTIBAN ──
+BYPASS_SIG       = V4_ST_B181EF9E
+ANTIBAN_HASH     = 3912818FB2BE047C
+INJECT_MODE      = SILENT
+</script>
+<script>; ╔═══════════════════════════════════════╗
+; ║   MODULE: FULL COMBO ULTRA v4.5     ║
+; ╚═══════════════════════════════════════╝
+; UID: 0E9ADE-48B5-BA1B-F45ABA0E | TS: 19D1159B386
+; Device: ULTRA_HIGH | Game: com.dts.freefiremax
+
+[COMBO_CORE — ALL IN ONE]
+AIM_LOCK         = HEAD_AUTO_TRACK
+HEADSHOT_BIAS    = 0.9257
+SMOOTH_TRACK     = 0.9344
+RECOIL_DAMP      = 0.9924
+SHAKE_NULL       = TRUE
+GYRO_DAMP        = 0.9587
+PREDICT_MS       = 0.046ms
+SILENT_AIM       = TRUE
+LOCK_RADIUS      = 2.7px
+
+[MEMORY_WRITE — com.dts.freefiremax]
+COMBO_BASE       = 0xE2A72EFA
+AIM_PTR          = 0x5435BCCA
+RECOIL_PTR       = 0x13F6E372
+STAB_PTR         = 0x0C7D5788
+SENSI_PTR        = 0x240B94EA
+HEADSHOT_PTR     = 0x085917D0
+PATTERN_SIG      = CC5B24EF91BEC315
+
+[REGISTRY]
+reg_add "HKLM\com.dts.freefiremax\Combo" /v "AutoHead"   /t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefiremax\Combo" /v "HSBias"     /t REG_SZ    /d "0.9494"
+reg_add "HKLM\com.dts.freefiremax\Combo" /v "NoRecoil"   /t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefiremax\Combo" /v "StabGyro"   /t REG_SZ    /d "0.9672"
+reg_add "HKLM\com.dts.freefiremax\Combo" /v "SilentAim"  /t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefiremax\Combo" /v "SmoothLvl"  /t REG_SZ    /d "0.9562"
+reg_add "HKLM\com.dts.freefiremax\Combo" /v "PredictMs"  /t REG_SZ    /d "0.028"
+
+[SENSI_COMBO]
+SENSI_Y          = 5.34
+SENSI_X          = 3.04
+DPI_LOCK         = 956
+TOUCH_RESP       = 1ms
+GPU_PROFILE      = ULTRA_HIGH
+RAM_ALLOC        = 8192MB
+
+; ── ANTIBAN ──
+BYPASS_SIG       = V4_FC_C1A078BB
+ANTIBAN_HASH     = 045C37EDC0782FB0
+INJECT_MODE      = GHOST_SILENT
+</script>
+<script> ; { THE MODULES FF MAX IPHONE / IOS }; ╔═══════════════════════════════════════╗
+; ║   MODULE: ZERO RECOIL v4.6          ║
+; ╚═══════════════════════════════════════╝
+; UID: A4B81E-A0F3-A3BC-496FF54B | TS: 19D115E023A
+; Device: METAL_API | Game: com.dts.freefiremax
+
+[RECOIL_PATCH_CORE]
+SHAKE_VECTOR_X   = -0.00072
+SHAKE_VECTOR_Y   = 0.00073
+RECOIL_DAMP      = 0.9747
+KICKBACK_NULL    = TRUE
+BARREL_STAB      = 0.9905
+FIRE_RECOVER_MS  = 2.6ms
+BURST_RESET      = INSTANT
+
+[MEMORY_WRITE — com.dts.freefiremax]
+RECOIL_BASE      = 0x071E6DA9
+RECOIL_PTR_1     = 0xC069F7F4
+RECOIL_PTR_2     = 0xBBFBFD18
+SHAKE_NULLIFY    = 0x442FE7B8
+PATTERN_SIG      = 41BD9EC8085B874F
+
+[REGISTRY]
+reg_add "HKLM\com.dts.freefiremax\Recoil" /v "ShakeX"    /t REG_SZ    /d "0.00093"
+reg_add "HKLM\com.dts.freefiremax\Recoil" /v "ShakeY"    /t REG_SZ    /d "0.0008"
+reg_add "HKLM\com.dts.freefiremax\Recoil" /v "NullRecoil"/t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefiremax\Recoil" /v "DampFactor"/t REG_SZ    /d "0.9896"
+reg_add "HKLM\com.dts.freefiremax\Recoil" /v "KickNull"  /t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefiremax\Recoil" /v "BurstCtrl" /t REG_SZ    /d "ZERO_2614"
+
+[SENSI_RECOIL_COMPENSATION]
+SENSI_Y          = 4.78
+SENSI_X          = 2.92
+DPI_LOCK         = 1148
+TOUCH_RESP       = 0.8ms
+GPU_PROFILE      = METAL_API
+
+; ── ANTIBAN ──
+BYPASS_SIG       = V4_NR_B851FC36
+ANTIBAN_HASH     = A8726C78D60FA7BA
+INJECT_MODE      = SILENT
+</script>
+<script>; ╔═══════════════════════════════════════╗
+; ║   MODULE: 100% AIMBOT HEADSHOT v4.5 ║
+; ╚═══════════════════════════════════════╝
+; UID: F3FDB8-6BD4-6667-0F496DB0 | TS: 19D115E023D
+; Device: METAL_API | Game: com.dts.freefiremax
+
+[AIMBOT_CORE]
+TARGET_BONE      = HEAD_CENTER
+LOCK_RADIUS      = 2.11px
+SMOOTH_TRACK     = 0.9469
+PREDICT_MS       = 0.025ms
+SNAP_SPEED       = 0.954
+FOV_LOCK         = 4.5°
+SILENT_AIM       = TRUE
+TRIGGER_DELAY    = 0.0038s
+
+[HEADSHOT_BIAS]
+HS_PRIORITY      = 95.4%
+BONE_WEIGHT_HEAD = 0.9386
+BONE_WEIGHT_NECK = 0.0392
+BONE_WEIGHT_BODY = 0.0061
+AUTO_ADJUST      = TRUE
+COMPENSATION_Y   = -0.0221
+
+[MEMORY_WRITE — com.dts.freefiremax]
+AIM_BASE         = 0xA3BA6343
+BONE_PTR         = 0x56879FB3
+FOV_PTR          = 0x76EFC24A
+SMOOTH_PTR       = 0xAE22FB87
+HEADSHOT_PTR     = 0x58FECF10
+PATTERN_SIG      = 71C4F09E7C257A71
+
+[REGISTRY]
+reg_add "HKLM\com.dts.freefiremax\Aim" /v "AutoHead"    /t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefiremax\Aim" /v "BoneTarget"  /t REG_SZ    /d "HEAD_CENTER"
+reg_add "HKLM\com.dts.freefiremax\Aim" /v "LockRadius"  /t REG_SZ    /d "2.34"
+reg_add "HKLM\com.dts.freefiremax\Aim" /v "SmoothLevel" /t REG_SZ    /d "0.9651"
+reg_add "HKLM\com.dts.freefiremax\Aim" /v "SilentAim"   /t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefiremax\Aim" /v "HSBias"      /t REG_SZ    /d "0.9602"
+reg_add "HKLM\com.dts.freefiremax\Aim" /v "PredictMs"   /t REG_SZ    /d "0.035"
+
+[SENSI_AIM_TUNE]
+SENSI_Y          = 4.57
+SENSI_X          = 2.71
+DPI_LOCK         = 1148
+TOUCH_RESP       = 0.8ms
+
+; ── ANTIBAN ──
+BYPASS_SIG       = V4_AB_FF5F3D73
+ANTIBAN_HASH     = 84AF2EDB33F42FA3
+INJECT_MODE      = GHOST
+</script>
+<script>; ╔═══════════════════════════════════════╗
+; ║   MODULE: 100% AIM STABILIZER v4.7  ║
+; ╚═══════════════════════════════════════╝
+; UID: A5D584-62E5-795B-D29ECCFF | TS: 19D115E023E
+; Device: METAL_API | Game: com.dts.freefiremax
+
+[STABILIZER_CORE]
+GYRO_DAMP        = 0.9852
+HAND_SHAKE_NULL  = TRUE
+DRIFT_CORRECT    = 0.9745
+SWAY_FACTOR      = 0.004
+MICRO_ADJ_MS     = 1.85ms
+CROSSHAIR_LOCK   = STATIC
+IDLE_DRIFT       = ZERO
+
+[GYRO_CALIBRATION]
+GYRO_X           = 0.00036
+GYRO_Y           = 0.00072
+GYRO_Z           = 0.00094
+ACCEL_COMP       = 0.9834
+GRAVITY_OFFSET   = -0.00053
+
+[MEMORY_WRITE — com.dts.freefiremax]
+STAB_BASE        = 0x6D6E745F
+GYRO_PTR         = 0x46CFDA90
+DRIFT_PTR        = 0x4B228BCA
+SWAY_PTR         = 0xEBC24156
+PATTERN_SIG      = F809EE70524981C1
+
+[REGISTRY]
+reg_add "HKLM\com.dts.freefiremax\Stab" /v "GyroDamp"    /t REG_SZ    /d "0.965"
+reg_add "HKLM\com.dts.freefiremax\Stab" /v "HandShake"   /t REG_DWORD /d 0
+reg_add "HKLM\com.dts.freefiremax\Stab" /v "DriftCorr"   /t REG_SZ    /d "0.9803"
+reg_add "HKLM\com.dts.freefiremax\Stab" /v "SwayFactor"  /t REG_SZ    /d "0.0024"
+reg_add "HKLM\com.dts.freefiremax\Stab" /v "CrossLock"   /t REG_SZ    /d "STATIC_0BC6"
+reg_add "HKLM\com.dts.freefiremax\Stab" /v "MicroAdj"    /t REG_SZ    /d "1ms"
+
+[SENSI_STAB_TUNE]
+SENSI_Y          = 4.39
+SENSI_X          = 3.58
+DPI_LOCK         = 1148
+TOUCH_RESP       = 0.8ms
+GPU_PROFILE      = METAL_API
+
+; ── ANTIBAN ──
+BYPASS_SIG       = V4_ST_D66BAE3D
+ANTIBAN_HASH     = 09B46B5991F4F6A9
+INJECT_MODE      = SILENT
+</script>
+<script>; ╔═══════════════════════════════════════╗
+; ║   MODULE: FULL COMBO ULTRA v4.5     ║
+; ╚═══════════════════════════════════════╝
+; UID: 910680-30B1-52F6-0C9EBBB5 | TS: 19D115E023F
+; Device: METAL_API | Game: com.dts.freefiremax
+
+[COMBO_CORE — ALL IN ONE]
+AIM_LOCK         = HEAD_AUTO_TRACK
+HEADSHOT_BIAS    = 0.9106
+SMOOTH_TRACK     = 0.9204
+RECOIL_DAMP      = 0.9828
+SHAKE_NULL       = TRUE
+GYRO_DAMP        = 0.9951
+PREDICT_MS       = 0.037ms
+SILENT_AIM       = TRUE
+LOCK_RADIUS      = 3.19px
+
+[MEMORY_WRITE — com.dts.freefiremax]
+COMBO_BASE       = 0x848A3AEB
+AIM_PTR          = 0xD33760E3
+RECOIL_PTR       = 0xD95A657D
+STAB_PTR         = 0x40F31B67
+SENSI_PTR        = 0x6B756292
+HEADSHOT_PTR     = 0xA544F8C5
+PATTERN_SIG      = B1932DF3C426DD4D
+
+[REGISTRY]
+reg_add "HKLM\com.dts.freefiremax\Combo" /v "AutoHead"   /t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefiremax\Combo" /v "HSBias"     /t REG_SZ    /d "0.8878"
+reg_add "HKLM\com.dts.freefiremax\Combo" /v "NoRecoil"   /t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefiremax\Combo" /v "StabGyro"   /t REG_SZ    /d "0.9459"
+reg_add "HKLM\com.dts.freefiremax\Combo" /v "SilentAim"  /t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefiremax\Combo" /v "SmoothLvl"  /t REG_SZ    /d "0.9655"
+reg_add "HKLM\com.dts.freefiremax\Combo" /v "PredictMs"  /t REG_SZ    /d "0.023"
+
+[SENSI_COMBO]
+SENSI_Y          = 5.08
+SENSI_X          = 3.21
+DPI_LOCK         = 1148
+TOUCH_RESP       = 0.8ms
+GPU_PROFILE      = METAL_API
+RAM_ALLOC        = 6144MB
+
+; ── ANTIBAN ──
+BYPASS_SIG       = V4_FC_9A84B318
+ANTIBAN_HASH     = D38130C568897E5B
+INJECT_MODE      = GHOST_SILENT
+</script>
+<script> ; { THE MODULES FF MAX PC / NOTEBOOK }; ╔═══════════════════════════════════════╗
+; ║   MODULE: ZERO RECOIL v4.1          ║
+; ╚═══════════════════════════════════════╝
+; UID: 1DFD0C-E411-F124-DC12129E | TS: 19D1160AE71
+; Device: DX12_BOOST | Game: com.dts.freefiremax
+
+[RECOIL_PATCH_CORE]
+SHAKE_VECTOR_X   = 0.00071
+SHAKE_VECTOR_Y   = -0.00059
+RECOIL_DAMP      = 0.9941
+KICKBACK_NULL    = TRUE
+BARREL_STAB      = 0.9815
+FIRE_RECOVER_MS  = 4.3ms
+BURST_RESET      = INSTANT
+
+[MEMORY_WRITE — com.dts.freefiremax]
+RECOIL_BASE      = 0x9C83D928
+RECOIL_PTR_1     = 0xE278B3A2
+RECOIL_PTR_2     = 0x5346D51C
+SHAKE_NULLIFY    = 0x9729CD75
+PATTERN_SIG      = 80B106D870F73F0A
+
+[REGISTRY]
+reg_add "HKLM\com.dts.freefiremax\Recoil" /v "ShakeX"    /t REG_SZ    /d "-0.00042"
+reg_add "HKLM\com.dts.freefiremax\Recoil" /v "ShakeY"    /t REG_SZ    /d "-0.0006"
+reg_add "HKLM\com.dts.freefiremax\Recoil" /v "NullRecoil"/t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefiremax\Recoil" /v "DampFactor"/t REG_SZ    /d "0.992"
+reg_add "HKLM\com.dts.freefiremax\Recoil" /v "KickNull"  /t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefiremax\Recoil" /v "BurstCtrl" /t REG_SZ    /d "ZERO_C197"
+
+[SENSI_RECOIL_COMPENSATION]
+SENSI_Y          = 5.18
+SENSI_X          = 2.26
+DPI_LOCK         = 1570
+TOUCH_RESP       = 0.5ms
+GPU_PROFILE      = DX12_BOOST
+
+; ── ANTIBAN ──
+BYPASS_SIG       = V4_NR_FA4979CB
+ANTIBAN_HASH     = D818F51746E87081
+INJECT_MODE      = SILENT
+</script>
+<script>; ╔═══════════════════════════════════════╗
+; ║   MODULE: 100% AIMBOT HEADSHOT v4.2 ║
+; ╚═══════════════════════════════════════╝
+; UID: AB1035-EB94-4765-E06BC28D | TS: 19D1160AE72
+; Device: DX12_BOOST | Game: com.dts.freefiremax
+
+[AIMBOT_CORE]
+TARGET_BONE      = HEAD_CENTER
+LOCK_RADIUS      = 1.33px
+SMOOTH_TRACK     = 0.9719
+PREDICT_MS       = 0.033ms
+SNAP_SPEED       = 0.851
+FOV_LOCK         = 3.5°
+SILENT_AIM       = TRUE
+TRIGGER_DELAY    = 0.0026s
+
+[HEADSHOT_BIAS]
+HS_PRIORITY      = 99%
+BONE_WEIGHT_HEAD = 0.9275
+BONE_WEIGHT_NECK = 0.0488
+BONE_WEIGHT_BODY = 0.0164
+AUTO_ADJUST      = TRUE
+COMPENSATION_Y   = 0.0438
+
+[MEMORY_WRITE — com.dts.freefiremax]
+AIM_BASE         = 0x506788FF
+BONE_PTR         = 0x6345B2CC
+FOV_PTR          = 0x25B52F2F
+SMOOTH_PTR       = 0x6E96BCA0
+HEADSHOT_PTR     = 0x048D1E1F
+PATTERN_SIG      = 557FAC0858B46BA1
+
+[REGISTRY]
+reg_add "HKLM\com.dts.freefiremax\Aim" /v "AutoHead"    /t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefiremax\Aim" /v "BoneTarget"  /t REG_SZ    /d "HEAD_CENTER"
+reg_add "HKLM\com.dts.freefiremax\Aim" /v "LockRadius"  /t REG_SZ    /d "1.29"
+reg_add "HKLM\com.dts.freefiremax\Aim" /v "SmoothLevel" /t REG_SZ    /d "0.9899"
+reg_add "HKLM\com.dts.freefiremax\Aim" /v "SilentAim"   /t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefiremax\Aim" /v "HSBias"      /t REG_SZ    /d "0.9564"
+reg_add "HKLM\com.dts.freefiremax\Aim" /v "PredictMs"   /t REG_SZ    /d "0.036"
+
+[SENSI_AIM_TUNE]
+SENSI_Y          = 4.70
+SENSI_X          = 2.68
+DPI_LOCK         = 1570
+TOUCH_RESP       = 0.5ms
+
+; ── ANTIBAN ──
+BYPASS_SIG       = V4_AB_36BBB2C8
+ANTIBAN_HASH     = FFF813F2EF444E5C
+INJECT_MODE      = GHOST
+</script>
+<script>; ╔═══════════════════════════════════════╗
+; ║   MODULE: 100% AIM STABILIZER v4.3  ║
+; ╚═══════════════════════════════════════╝
+; UID: A72B25-AB90-49C3-52E58C4C | TS: 19D1160AE73
+; Device: DX12_BOOST | Game: com.dts.freefiremax
+
+[STABILIZER_CORE]
+GYRO_DAMP        = 0.9814
+HAND_SHAKE_NULL  = TRUE
+DRIFT_CORRECT    = 0.9846
+SWAY_FACTOR      = 0.0021
+MICRO_ADJ_MS     = 1.87ms
+CROSSHAIR_LOCK   = STATIC
+IDLE_DRIFT       = ZERO
+
+[GYRO_CALIBRATION]
+GYRO_X           = -0.0013
+GYRO_Y           = 0.00078
+GYRO_Z           = -0.00065
+ACCEL_COMP       = 0.9846
+GRAVITY_OFFSET   = 0.00002
+
+[MEMORY_WRITE — com.dts.freefiremax]
+STAB_BASE        = 0x4F39C4BA
+GYRO_PTR         = 0x49C7F09C
+DRIFT_PTR        = 0xF2E81552
+SWAY_PTR         = 0x2CA66B64
+PATTERN_SIG      = D2DF60E639A544B4
+
+[REGISTRY]
+reg_add "HKLM\com.dts.freefiremax\Stab" /v "GyroDamp"    /t REG_SZ    /d "0.9729"
+reg_add "HKLM\com.dts.freefiremax\Stab" /v "HandShake"   /t REG_DWORD /d 0
+reg_add "HKLM\com.dts.freefiremax\Stab" /v "DriftCorr"   /t REG_SZ    /d "0.9744"
+reg_add "HKLM\com.dts.freefiremax\Stab" /v "SwayFactor"  /t REG_SZ    /d "0.0022"
+reg_add "HKLM\com.dts.freefiremax\Stab" /v "CrossLock"   /t REG_SZ    /d "STATIC_66C3"
+reg_add "HKLM\com.dts.freefiremax\Stab" /v "MicroAdj"    /t REG_SZ    /d "1.52ms"
+
+[SENSI_STAB_TUNE]
+SENSI_Y          = 4.62
+SENSI_X          = 2.92
+DPI_LOCK         = 1570
+TOUCH_RESP       = 0.5ms
+GPU_PROFILE      = DX12_BOOST
+
+; ── ANTIBAN ──
+BYPASS_SIG       = V4_ST_58AFE180
+ANTIBAN_HASH     = 1A4EEFF63534740B
+INJECT_MODE      = SILENT
+</script>
+<script>; ╔═══════════════════════════════════════╗
+; ║   MODULE: FULL COMBO ULTRA v4.6     ║
+; ╚═══════════════════════════════════════╝
+; UID: 08F327-4787-46DC-83132820 | TS: 19D1160AE74
+; Device: DX12_BOOST | Game: com.dts.freefiremax
+
+[COMBO_CORE — ALL IN ONE]
+AIM_LOCK         = HEAD_AUTO_TRACK
+HEADSHOT_BIAS    = 0.9117
+SMOOTH_TRACK     = 0.9332
+RECOIL_DAMP      = 0.9861
+SHAKE_NULL       = TRUE
+GYRO_DAMP        = 0.9915
+PREDICT_MS       = 0.032ms
+SILENT_AIM       = TRUE
+LOCK_RADIUS      = 3.07px
+
+[MEMORY_WRITE — com.dts.freefiremax]
+COMBO_BASE       = 0x882F1E52
+AIM_PTR          = 0xC6FC99BB
+RECOIL_PTR       = 0x9A820B7F
+STAB_PTR         = 0xB38EAAFA
+SENSI_PTR        = 0x5D4407E2
+HEADSHOT_PTR     = 0xB31BDA49
+PATTERN_SIG      = 9A65E7DAA97DD9B2
+
+[REGISTRY]
+reg_add "HKLM\com.dts.freefiremax\Combo" /v "AutoHead"   /t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefiremax\Combo" /v "HSBias"     /t REG_SZ    /d "0.9316"
+reg_add "HKLM\com.dts.freefiremax\Combo" /v "NoRecoil"   /t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefiremax\Combo" /v "StabGyro"   /t REG_SZ    /d "0.9598"
+reg_add "HKLM\com.dts.freefiremax\Combo" /v "SilentAim"  /t REG_DWORD /d 1
+reg_add "HKLM\com.dts.freefiremax\Combo" /v "SmoothLvl"  /t REG_SZ    /d "0.9239"
+reg_add "HKLM\com.dts.freefiremax\Combo" /v "PredictMs"  /t REG_SZ    /d "0.031"
+
+[SENSI_COMBO]
+SENSI_Y          = 5.50
+SENSI_X          = 3.43
+DPI_LOCK         = 1570
+TOUCH_RESP       = 0.5ms
+GPU_PROFILE      = DX12_BOOST
+RAM_ALLOC        = 16384MB
+
+; ── ANTIBAN ──
+BYPASS_SIG       = V4_FC_351206B3
+ANTIBAN_HASH     = F2E09B83676C87A4
+INJECT_MODE      = GHOST_SILENT
+</script>
+</body>
+</html>
